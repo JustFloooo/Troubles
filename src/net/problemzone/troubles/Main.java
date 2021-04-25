@@ -1,6 +1,7 @@
 package net.problemzone.troubles;
 
 import net.problemzone.troubles.commands.start;
+import net.problemzone.troubles.game.GameListener;
 import net.problemzone.troubles.game.GameManager;
 import net.problemzone.troubles.items.ItemListener;
 import net.problemzone.troubles.items.ItemManager;
@@ -45,7 +46,8 @@ public class Main extends JavaPlugin {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new ScoreboardListener(scoreboardHandler), this);
         getServer().getPluginManager().registerEvents(new ItemListener(itemManager, spectatorManager, gameManager), this);
-        getServer().getPluginManager().registerEvents(new SpectatorListener(spectatorManager), this);
+        getServer().getPluginManager().registerEvents(new SpectatorListener(spectatorManager, gameManager), this);
+        getServer().getPluginManager().registerEvents(new GameListener(gameManager), this);
     }
 
     public static JavaPlugin getJavaPlugin() {

@@ -3,8 +3,7 @@ package net.problemzone.troubles.game;
 import net.problemzone.troubles.Main;
 import net.problemzone.troubles.scoreboard.ScoreboardHandler;
 import net.problemzone.troubles.util.Countdown;
-import net.problemzone.troubles.util.language.Language;
-import net.problemzone.troubles.util.language.LanguageKeyword;
+import net.problemzone.troubles.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -12,17 +11,17 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class GameManager {
 
-    private final int COUNTDOWN_SECONDS = 30;
+    private final int WARM_UP_TIME = 30;
+    private final int MIN_PLAYERS = 4;
 
     private final ScoreboardHandler scoreboardHandler;
 
-    private final List<Player> traitors = new ArrayList<>();
-    private final List<Player> detectives = new ArrayList<>();
+    private final Map<Player, Role> playerRoleMap = new HashMap<>();
+    private List<Player> possiblePlayers;
     private GameState gameState = GameState.STARTING;
 
     public GameManager(ScoreboardHandler scoreboardHandler) {
@@ -30,76 +29,117 @@ public class GameManager {
     }
 
     public void initiateGame() {
-        initiateGame(COUNTDOWN_SECONDS);
+        initiateGame(WARM_UP_TIME);
     }
 
+    //Starts Lobby Countdown
     public void initiateGame(int seconds) {
 
         //Initialize Countdown
-        Countdown.initiateCountdown(seconds * 20);
+        Countdown.initiateCountdown(seconds * 20, Language.TITLE_START);
 
-        gameState = GameState.WARM_UP;
-
-        //Start after Countdown
+        //Set GameState to WarmUp
         new BukkitRunnable() {
             @Override
             public void run() {
-                start();
+                startWarmUp();
             }
         }.runTaskLater(Main.getJavaPlugin(), seconds * 20L);
 
     }
 
-    private void start() {
+    //Starts Warm Up Phase
+    private void startWarmUp() {
 
-        List<Player> allPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
-        if (allPlayers.size() > 0) {
+        if (Bukkit.getOnlinePlayers().size() < MIN_PLAYERS) {
+            Bukkit.broadcastMessage(Language.NOT_ENOUGH_PLAYERS.getFormattedText());
+            gameState = GameState.STARTING;
+            return;
+        }
 
-            //Initialize Scoreboard
-            scoreboardHandler.init();
+        possiblePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
 
-            //Determine roles
-            int traitor_count = (allPlayers.size() + 1) / 3;
-            int detective_count = allPlayers.size() / 4 + 1;
-            assignPlayersToRole(allPlayers, traitor_count, traitors);
-            assignPlayersToRole(allPlayers, detective_count, detectives);
+        //TODO: Teleport Players to Arena
 
-            //Tell players the role
-            for(Player player : Bukkit.getOnlinePlayers()){
-                LanguageKeyword role = LanguageKeyword.INNOCENT_ROLE;
-                LanguageKeyword description = LanguageKeyword.INNOCENT_DESCRIPTION;
-                if(traitors.contains(player)){
-                    role = LanguageKeyword.TRAITOR_ROLE;
-                    description = LanguageKeyword.TRAITOR_DESCIRPTION;
-                }
-                if(detectives.contains(player)){
-                    role = LanguageKeyword.DETECTIVE_ROLE;
-                    description = LanguageKeyword.DETECTIVE_DESCRIPTION;
-                }
-                player.sendTitle(Language.getUnformattedStringFromKeyword(role), Language.getUnformattedStringFromKeyword(description), 10, 60, 10);
-                player.sendMessage(String.format(Language.getStringFromKeyword(LanguageKeyword.ROLE_ASSIGNED), Language.getUnformattedStringFromKeyword(role)) + " " + ChatColor.GRAY + Language.getUnformattedStringFromKeyword(description));
-                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
+        gameState = GameState.WARM_UP;
 
-                scoreboardHandler.setScoreboard(player, Language.getUnformattedStringFromKeyword(role));
+        //Initialize Countdown
+        Countdown.initiateCountdown(WARM_UP_TIME * 20, Language.TITLE_START);
+
+        //Set GameState to Countdown
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                startGame();
             }
-            gameState = GameState.RUNNING;
-        } else {
+        }.runTaskLater(Main.getJavaPlugin(), WARM_UP_TIME * 20L);
+    }
+
+    private void startGame() {
+
+        if (possiblePlayers.size() < MIN_PLAYERS) {
+            Bukkit.broadcastMessage(Language.NOT_ENOUGH_PLAYERS.getFormattedText());
             gameState = GameState.FINISHED;
+            //TODO: Cancel Game
+            return;
+        }
+
+        //Distribute Game Roles
+        determinePlayerRoles();
+        playerRoleMap.keySet().forEach(this::initializePlayer);
+
+        gameState = GameState.RUNNING;
+    }
+
+    private void determinePlayerRoles() {
+
+        int traitor_count = (possiblePlayers.size() + 1) / 3; //5->2, 8->3, 11->4
+        int detective_count = possiblePlayers.size() / 6 + 1; //6->2 12->3
+        Collections.shuffle(possiblePlayers);
+        possiblePlayers.subList(0, traitor_count).forEach(player -> playerRoleMap.put(player, Role.TRAITOR));
+        possiblePlayers.subList(traitor_count, traitor_count + detective_count).forEach(player -> playerRoleMap.put(player, Role.DETECTIVE));
+        possiblePlayers.subList(traitor_count + detective_count, possiblePlayers.size()).forEach(player -> playerRoleMap.put(player, Role.INNOCENT));
+    }
+
+    private void initializePlayer(Player player) {
+        Role role = playerRoleMap.get(player);
+
+        player.sendTitle(role.getRoleName().getText(), role.getRoleDescription().getText(), 10, 60, 10);
+        player.sendMessage(String.format(Language.ROLE_ASSIGNED.getFormattedText(), role.getRoleName().getText()) + " " + ChatColor.GRAY + role.getRoleDescription().getText());
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
+
+        scoreboardHandler.setScoreboard(player, role.getRoleName().getText());
+    }
+
+    private void checkForWin(){
+        if(!playerRoleMap.containsValue(Role.TRAITOR)){
+            announceWin(Role.INNOCENT);
+            return;
+        }
+        if(!playerRoleMap.containsValue(Role.INNOCENT) && !playerRoleMap.containsValue(Role.DETECTIVE)){
+            announceWin(Role.TRAITOR);
         }
     }
 
-    private void assignPlayersToRole(List<Player> listFrom, int count, List<Player> listTo) {
-        while (count > 0) {
-            Player player = listFrom.stream().skip((int) (listFrom.size() * Math.random())).findFirst().orElse(null);
-            if (player != null) {
-                listTo.add(player);
-                listFrom.remove(player);
-            }
-            count--;
-        }
+    private void announceWin(Role role){
+        gameState = GameState.FINISHED;
+
+        //TODO: Teleport Players to Lobby
+
+        Bukkit.broadcastMessage(String.format(Language.ROLE_WIN.getFormattedText(), role.getRoleName().getText()));
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            player.sendTitle(String.format(Language.ROLE_WIN.getText(), role.getRoleName().getText()), "", 10, 60, 10);
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
+        });
     }
 
     public GameState getGameState() {
         return gameState;
+    }
+
+    public void removePlayer(Player player) {
+        possiblePlayers.remove(player);
+        playerRoleMap.remove(player);
+        checkForWin();
     }
 }

@@ -1,8 +1,6 @@
 package net.problemzone.troubles.util;
 
 import net.problemzone.troubles.Main;
-import net.problemzone.troubles.util.language.Language;
-import net.problemzone.troubles.util.language.LanguageKeyword;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -11,7 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Countdown {
 
-    public static void initiateCountdown(int ticks) {
+    public static void initiateCountdown(int ticks, Language title) {
 
         Bukkit.getOnlinePlayers().forEach(player -> {
             player.setExp(1);
@@ -43,7 +41,7 @@ public class Countdown {
                     } else {
                         player.setLevel(player.getLevel()-1);
                         if(player.getLevel()<=3 && player.getLevel() > 0){
-                            player.sendTitle(Language.getUnformattedStringFromKeyword(LanguageKeyword.TITLE_START), ChatColor.GREEN + "" + player.getLevel(), 0, 20, 0);
+                            player.sendTitle(title.getText(), ChatColor.GREEN + "" + player.getLevel(), 0, 20, 0);
                             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 0.5F);
                         }
                     }
