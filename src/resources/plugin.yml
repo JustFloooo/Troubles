@@ -2,6 +2,7 @@ main: net.problemzone.troubles.Main
 version: 0.2
 name: Troubles
 authors: [JustFloooo]
+depend: [ProtocolLib]
 api-version: 1.13
 commands:
   start:

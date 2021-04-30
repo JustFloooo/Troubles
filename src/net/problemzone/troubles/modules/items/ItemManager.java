@@ -1,4 +1,4 @@
-package net.problemzone.troubles.items;
+package net.problemzone.troubles.modules.items;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,7 +30,7 @@ public class ItemManager {
     }
 
     public boolean giveEnderItemToPlayer(Player player) {
-        if(player.getInventory().contains(enderItem)) return false;
+        if (player.getInventory().contains(enderItem)) return false;
 
         player.getInventory().addItem(enderItem);
         return true;

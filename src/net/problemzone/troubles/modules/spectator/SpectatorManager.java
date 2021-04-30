@@ -1,4 +1,4 @@
-package net.problemzone.troubles.spectator;
+package net.problemzone.troubles.modules.spectator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

@@ -1,5 +1,6 @@
-package net.problemzone.troubles.scoreboard;
+package net.problemzone.troubles.modules.scoreboard;
 
+import net.problemzone.troubles.modules.game.Role;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -10,11 +11,11 @@ import java.util.Map;
 import java.util.Objects;
 
 
-public class ScoreboardHandler {
+public class ScoreboardManager {
 
     private final Map<Player, Integer> playerKills = new HashMap<>();
 
-    public void setScoreboard(Player player, String role) {
+    public void setScoreboard(Player player, Role role) {
 
         Scoreboard board = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
         Objective obj = board.registerNewObjective("Infos", "dummy", ChatColor.RED + "TROUBLES");
@@ -26,7 +27,7 @@ public class ScoreboardHandler {
         roleName.setScore(5);
         Team roleCounter = board.registerNewTeam("roleCounter");
         roleCounter.addEntry(ChatColor.RED + "" + ChatColor.WHITE);
-        roleCounter.setPrefix(role);
+        roleCounter.setPrefix(role.getRoleName().getText());
         obj.getScore(ChatColor.RED + "" + ChatColor.WHITE).setScore(4);
 
         obj.getScore("  ").setScore(3);

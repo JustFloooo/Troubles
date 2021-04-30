@@ -1,6 +1,6 @@
 package net.problemzone.troubles.commands;
 
-import net.problemzone.troubles.game.GameManager;
+import net.problemzone.troubles.modules.game.GameManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

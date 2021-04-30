@@ -1,4 +1,4 @@
-package net.problemzone.troubles.scoreboard;
+package net.problemzone.troubles.modules.scoreboard;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,10 +9,10 @@ import java.util.Objects;
 
 public class ScoreboardListener implements Listener {
 
-    private final ScoreboardHandler scoreboardHandler;
+    private final ScoreboardManager scoreboardManager;
 
-    public ScoreboardListener(ScoreboardHandler scoreboardHandler) {
-        this.scoreboardHandler = scoreboardHandler;
+    public ScoreboardListener(ScoreboardManager scoreboardManager) {
+        this.scoreboardManager = scoreboardManager;
     }
 
     @EventHandler
@@ -20,7 +20,7 @@ public class ScoreboardListener implements Listener {
 
         if(Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             if (event.getEntity().getKiller() != null) {
-                scoreboardHandler.increaseKillCounter(event.getEntity().getKiller());
+                scoreboardManager.increaseKillCounter(event.getEntity().getKiller());
             }
         }
     }

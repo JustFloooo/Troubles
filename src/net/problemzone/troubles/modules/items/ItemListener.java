@@ -1,8 +1,8 @@
-package net.problemzone.troubles.items;
+package net.problemzone.troubles.modules.items;
 
-import net.problemzone.troubles.game.GameState;
-import net.problemzone.troubles.game.GameManager;
-import net.problemzone.troubles.spectator.SpectatorManager;
+import net.problemzone.troubles.modules.game.GameManager;
+import net.problemzone.troubles.modules.game.GameState;
+import net.problemzone.troubles.modules.spectator.SpectatorManager;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,12 +25,12 @@ public class ItemListener implements Listener {
 
     @EventHandler
     public void onChestOpen(PlayerInteractEvent e) {
-        if(!spectatorManager.isSpectator(e.getPlayer())){
+        if (!spectatorManager.isSpectator(e.getPlayer())) {
             if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
                 //Chest Items
                 if (Objects.requireNonNull(e.getClickedBlock()).getType() == Material.CHEST) {
-                    if(gameManager.getGameState()== GameState.WARM_UP || gameManager.getGameState()==GameState.RUNNING){
+                    if (gameManager.getGameState() == GameState.WARM_UP || gameManager.getGameState() == GameState.RUNNING) {
                         if (itemManager.giveChestItemToPlayer(e.getPlayer())) e.getClickedBlock().setType(Material.AIR);
                         e.setCancelled(true);
                     }
@@ -38,7 +38,7 @@ public class ItemListener implements Listener {
 
                 //Enderchest Item
                 if (Objects.requireNonNull(e.getClickedBlock()).getType() == Material.ENDER_CHEST) {
-                    if(gameManager.getGameState() == GameState.RUNNING){
+                    if (gameManager.getGameState() == GameState.RUNNING) {
                         if (itemManager.giveEnderItemToPlayer(e.getPlayer())) e.getClickedBlock().setType(Material.AIR);
                         e.setCancelled(true);
                     }

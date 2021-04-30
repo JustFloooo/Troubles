@@ -1,4 +1,4 @@
-package net.problemzone.troubles.game;
+package net.problemzone.troubles.modules.game;
 
 import net.problemzone.troubles.util.Language;
 

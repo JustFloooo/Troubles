@@ -1,8 +1,8 @@
-package net.problemzone.troubles.spectator;
+package net.problemzone.troubles.modules.spectator;
 
 import net.problemzone.troubles.Main;
-import net.problemzone.troubles.game.GameManager;
-import net.problemzone.troubles.game.GameState;
+import net.problemzone.troubles.modules.game.GameManager;
+import net.problemzone.troubles.modules.game.GameState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

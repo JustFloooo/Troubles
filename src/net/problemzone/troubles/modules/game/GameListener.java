@@ -1,4 +1,4 @@
-package net.problemzone.troubles.game;
+package net.problemzone.troubles.modules.game;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
