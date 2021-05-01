@@ -1,15 +1,12 @@
 package net.problemzone.troubles;
 
-import com.comphenix.protocol.ProtocolLibrary;
 import net.problemzone.troubles.commands.start;
 import net.problemzone.troubles.modules.game.GameListener;
 import net.problemzone.troubles.modules.game.GameManager;
-import net.problemzone.troubles.modules.items.EntityEquipmentListener;
 import net.problemzone.troubles.modules.items.ItemListener;
 import net.problemzone.troubles.modules.items.ItemManager;
-import net.problemzone.troubles.modules.player.PlayerManager;
-import net.problemzone.troubles.modules.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.modules.scoreboard.ScoreboardListener;
+import net.problemzone.troubles.modules.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.modules.spectator.SpectatorListener;
 import net.problemzone.troubles.modules.spectator.SpectatorManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,8 +20,7 @@ public class Main extends JavaPlugin {
     private final ScoreboardManager scoreboardManager = new ScoreboardManager();
     private final ItemManager itemManager = new ItemManager();
     private final SpectatorManager spectatorManager = new SpectatorManager();
-    private final PlayerManager playerManager = new PlayerManager(scoreboardManager);
-    private final GameManager gameManager = new GameManager(playerManager);
+    private final GameManager gameManager = new GameManager(scoreboardManager);
 
     public static JavaPlugin getJavaPlugin() {
         return javaPlugin;
@@ -57,9 +53,6 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ItemListener(itemManager, spectatorManager, gameManager), this);
         getServer().getPluginManager().registerEvents(new SpectatorListener(spectatorManager, gameManager), this);
         getServer().getPluginManager().registerEvents(new GameListener(gameManager), this);
-
-        //Package Listeners
-        ProtocolLibrary.getProtocolManager().addPacketListener(new EntityEquipmentListener(gameManager));
     }
 
 }

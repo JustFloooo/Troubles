@@ -2,9 +2,10 @@ package net.problemzone.troubles.modules.game;
 
 import com.comphenix.protocol.events.PacketContainer;
 import net.problemzone.troubles.Main;
-import net.problemzone.troubles.modules.player.PlayerManager;
+import net.problemzone.troubles.modules.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.util.Countdown;
 import net.problemzone.troubles.util.Language;
+import net.problemzone.troubles.util.Packages;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -19,14 +20,14 @@ public class GameManager {
     private final int WARM_UP_TIME = 30;
     private final int MIN_PLAYERS = 4;
 
-    private final PlayerManager playerManager;
+    private final ScoreboardManager scoreboardManager;
 
     private final Map<Player, Role> playerRoleMap = new HashMap<>();
     private List<Player> possiblePlayers;
-    private GameState gameState = GameState.STARTING;
+    private GameState gameState = GameState.WAITING;
 
-    public GameManager(PlayerManager playerManager) {
-        this.playerManager = playerManager;
+    public GameManager(ScoreboardManager scoreboardManager) {
+        this.scoreboardManager = scoreboardManager;
     }
 
     public void initiateGame() {
@@ -36,8 +37,12 @@ public class GameManager {
     //Starts Lobby Countdown
     public void initiateGame(int seconds) {
 
+        if(gameState != GameState.WAITING) return;
+
+        gameState = GameState.STARTING;
+
         //Initialize Countdown
-        Countdown.initiateCountdown(seconds * 20, Language.TITLE_START);
+        Countdown.xpBarCountdown(seconds * 20, Language.TITLE_START);
 
         //Set GameState to WarmUp
         new BukkitRunnable() {
@@ -45,7 +50,7 @@ public class GameManager {
             public void run() {
                 startWarmUp();
             }
-        }.runTaskLater(Main.getJavaPlugin(), seconds * 20L);
+        }.runTaskLater(Main.getJavaPlugin(), seconds * 20L + 10);
 
     }
 
@@ -54,7 +59,7 @@ public class GameManager {
 
         if (Bukkit.getOnlinePlayers().size() < MIN_PLAYERS) {
             Bukkit.broadcastMessage(Language.NOT_ENOUGH_PLAYERS.getFormattedText());
-            gameState = GameState.STARTING;
+            gameState = GameState.WAITING;
             return;
         }
 
@@ -65,7 +70,7 @@ public class GameManager {
         gameState = GameState.WARM_UP;
 
         //Initialize Countdown
-        Countdown.initiateCountdown(WARM_UP_TIME * 20, Language.TITLE_START);
+        Countdown.chatCountdown(WARM_UP_TIME, Language.TITLE_START);
 
         //Set GameState to Countdown
         new BukkitRunnable() {
@@ -73,7 +78,7 @@ public class GameManager {
             public void run() {
                 startGame();
             }
-        }.runTaskLater(Main.getJavaPlugin(), WARM_UP_TIME * 20L);
+        }.runTaskLater(Main.getJavaPlugin(), WARM_UP_TIME * 20L + 10);
     }
 
     //Assigns Roles and starts the Game
@@ -99,16 +104,32 @@ public class GameManager {
 
         possiblePlayers.subList(traitor_count + detective_count, possiblePlayers.size()).forEach(player -> playerRoleMap.put(player, Role.INNOCENT));
 
-        PacketContainer traitorNames = playerManager.createPlayerNameColorPacket(traitors, ChatColor.RED, "traitors");
-        PacketContainer detectiveNames = playerManager.createPlayerNameColorPacket(detectives, ChatColor.BLUE, "detectives");
+        //Create Name and Armor Packages
+        PacketContainer traitorNames = Packages.createPlayerNameColorPacket(traitors, ChatColor.RED, "traitors");
+        PacketContainer detectiveNames = Packages.createPlayerNameColorPacket(detectives, ChatColor.BLUE, "detectives");
+        //List<PacketContainer> traitorArmor = Packages.createFakeArmorPacket(traitors, Color.RED);
+        //List<PacketContainer> detectiveArmor = Packages.createFakeArmorPacket(traitors, Color.BLUE);
 
+        //Send Packages to players
         playerRoleMap.keySet().forEach(player -> {
-            playerManager.tellRoleToPlayer(player, playerRoleMap.get(player));
-            playerManager.sendPacket(player, detectiveNames);
-            if(playerRoleMap.get(player) == Role.TRAITOR) playerManager.sendPacket(player, traitorNames);
+            tellRoleToPlayer(player, playerRoleMap.get(player));
+            Packages.sendPacket(player, detectiveNames);
+            //Packages.sendPacket(player, detectiveArmor.toArray(PacketContainer[]::new));
+            if(playerRoleMap.get(player) == Role.TRAITOR){
+                Packages.sendPacket(player, traitorNames);
+                //Packages.sendPacket(player, traitorArmor.toArray(PacketContainer[]::new));
+            }
         });
 
         gameState = GameState.RUNNING;
+    }
+
+    public void tellRoleToPlayer(Player player, Role role) {
+        player.sendTitle(role.getRoleName().getText(), role.getRoleDescription().getText(), 10, 60, 10);
+        player.sendMessage(String.format(Language.ROLE_ASSIGNED.getFormattedText(), role.getRoleName().getText()) + " " + ChatColor.GRAY + role.getRoleDescription().getText());
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
+
+        scoreboardManager.setScoreboard(player, role);
     }
 
 
@@ -116,7 +137,7 @@ public class GameManager {
     public void removePlayer(Player player) {
         possiblePlayers.remove(player);
         playerRoleMap.remove(player);
-        checkForWin();
+        if(gameState == GameState.RUNNING) checkForWin();
     }
 
     private void checkForWin() {
@@ -138,6 +159,7 @@ public class GameManager {
         Bukkit.getOnlinePlayers().forEach(player -> {
             player.sendTitle(String.format(Language.ROLE_WIN.getText(), role.getRoleName().getText()), "", 10, 60, 10);
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
+            //TODO: Epic Advancement Sound
         });
     }
 

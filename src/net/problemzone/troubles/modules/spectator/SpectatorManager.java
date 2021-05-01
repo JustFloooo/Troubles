@@ -15,6 +15,7 @@ public class SpectatorManager {
         spectators.add(player);
 
         player.setPlayerListName(ChatColor.GRAY + player.getName() + ChatColor.RED + " ✗");
+        player.getInventory().clear();
         player.setInvisible(true);
         player.setInvulnerable(true);
         player.setCollidable(false);

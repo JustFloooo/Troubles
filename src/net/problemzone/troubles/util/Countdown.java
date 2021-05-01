@@ -7,9 +7,11 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class Countdown {
 
-    public static void initiateCountdown(int ticks, Language title) {
+    public static void xpBarCountdown(int ticks, Language title) {
 
         Bukkit.getOnlinePlayers().forEach(player -> {
             player.setExp(1);
@@ -46,6 +48,19 @@ public class Countdown {
                         }
                     }
                 });
+            }
+        }.runTaskTimer(Main.getJavaPlugin(), 0, 20);
+    }
+
+    public static void chatCountdown(int seconds, Language title){
+        AtomicInteger remaining= new AtomicInteger(seconds);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(remaining.get() == 0 ) this.cancel();
+                if(remaining.get() == 20 || remaining.get() == 10 || remaining.get() <=3)
+                Bukkit.broadcastMessage(title.getFormattedText() + " " + remaining);
+                remaining.getAndDecrement();
             }
         }.runTaskTimer(Main.getJavaPlugin(), 0, 20);
     }

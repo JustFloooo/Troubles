@@ -25,7 +25,7 @@ public class SpectatorListener implements Listener {
 
     @EventHandler
     public void onSpectatorJoin(PlayerJoinEvent e){
-        if(gameManager.getGameState() != GameState.STARTING){
+        if(gameManager.getGameState() != GameState.WAITING && gameManager.getGameState() != GameState.STARTING){
             spectatorManager.setPlayerAsSpectator(e.getPlayer());
         }
     }

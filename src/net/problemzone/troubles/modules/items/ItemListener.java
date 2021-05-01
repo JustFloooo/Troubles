@@ -30,17 +30,17 @@ public class ItemListener implements Listener {
 
                 //Chest Items
                 if (Objects.requireNonNull(e.getClickedBlock()).getType() == Material.CHEST) {
+                    e.setCancelled(true);
                     if (gameManager.getGameState() == GameState.WARM_UP || gameManager.getGameState() == GameState.RUNNING) {
                         if (itemManager.giveChestItemToPlayer(e.getPlayer())) e.getClickedBlock().setType(Material.AIR);
-                        e.setCancelled(true);
                     }
                 }
 
                 //Enderchest Item
                 if (Objects.requireNonNull(e.getClickedBlock()).getType() == Material.ENDER_CHEST) {
+                    e.setCancelled(true);
                     if (gameManager.getGameState() == GameState.RUNNING) {
                         if (itemManager.giveEnderItemToPlayer(e.getPlayer())) e.getClickedBlock().setType(Material.AIR);
-                        e.setCancelled(true);
                     }
 
                 }
