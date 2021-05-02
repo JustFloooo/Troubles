@@ -3,7 +3,7 @@ package net.problemzone.troubles.modules.game;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class GameListener implements Listener {
@@ -20,9 +20,7 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent e){
-        gameManager.removePlayer(e.getEntity());
-    }
+    public void onPlayerJoin(PlayerJoinEvent e){ e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation()); }
 
     @EventHandler
     public void preGameDamageListener(EntityDamageEvent e) {

@@ -12,7 +12,11 @@ public class ItemManager {
     private final Set<Set<ItemStack>> chestItemChoice = Set.of(
             Set.of(new ItemStack(Material.WOODEN_SWORD)),
             Set.of(new ItemStack(Material.STONE_SWORD)),
-            Set.of(new ItemStack(Material.BOW), new ItemStack(Material.ARROW, 32))
+            Set.of(new ItemStack(Material.BOW), new ItemStack(Material.ARROW, 16)),
+            Set.of(new ItemStack(Material.WOODEN_AXE)),
+            Set.of(new ItemStack(Material.STONE_AXE)),
+            Set.of(new ItemStack(Material.SHIELD)),
+            Set.of(new ItemStack(Material.CROSSBOW), new ItemStack(Material.ARROW, 10))
     );
 
     private final ItemStack enderItem = new ItemStack(Material.IRON_SWORD);

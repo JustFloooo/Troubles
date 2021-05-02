@@ -3,6 +3,7 @@ package net.problemzone.troubles.util;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import org.bukkit.ChatColor;
@@ -23,8 +24,8 @@ public class Packages {
     public static PacketContainer createPlayerNameColorPacket(List<Player> players, ChatColor color, String name) {
         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
 
-        //Mode (Byte?)
-        packet.getIntegers().write(1, 0);
+        //TODO: Friendly Fire Off??
+        //packet.getIntegers().write(1, 0);
 
         //Team Name
         packet.getStrings().write(0, name);
@@ -32,8 +33,8 @@ public class Packages {
         //Team Display Name (Needed?)
         packet.getChatComponents().write(0, WrappedChatComponent.fromText(name));
 
-        //Team Prefix
-        packet.getChatComponents().write(1, WrappedChatComponent.fromText("&6TEST" + " "));
+        //Team Color
+        packet.getEnumModifier(ChatColor.class, MinecraftReflection.getMinecraftClass("EnumChatFormat")).write(0, color);
 
         //Team Members
         packet.getSpecificModifier(Collection.class).write(0, players.stream().map(Player::getDisplayName).collect(Collectors.toList()));

@@ -3,8 +3,8 @@ package net.problemzone.troubles.util;
 import org.bukkit.ChatColor;
 
 public enum Language {
-
-    TITLE_START(ChatColor.RED + "Troubles" + ChatColor.GRAY + " startet in:"),
+    GAME_START("Das Spiel startet in: " + ChatColor.WHITE),
+    SERVER_CLOSE("Der Server schließt in: " + ChatColor.WHITE),
     NOT_ENOUGH_PLAYERS("Es sind zu wenig Spieler auf dem Server!"),
     ROLE_ASSIGNED("Du bist ein %s" + ChatColor.GRAY +"!"),
     ROLE_WIN("Die %s " + ChatColor.GRAY + "haben gewonnen!"),

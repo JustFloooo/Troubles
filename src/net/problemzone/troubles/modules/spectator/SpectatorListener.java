@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
@@ -33,7 +34,7 @@ public class SpectatorListener implements Listener {
     @EventHandler
     public void onSpectatorRespawn(PlayerRespawnEvent e) {
         Player player = e.getPlayer();
-        e.setRespawnLocation(e.getRespawnLocation().add(0,10,0));
+        e.setRespawnLocation(e.getPlayer().getWorld().getSpawnLocation());
 
         new BukkitRunnable() {
             @Override
@@ -41,6 +42,20 @@ public class SpectatorListener implements Listener {
                 spectatorManager.setPlayerAsSpectator(player);
             }
         }.runTaskLater(Main.getJavaPlugin(), 1);
+    }
+
+    @EventHandler
+    public void onPlayerDeathDamage(EntityDamageEvent e){
+        if(!(e.getEntity() instanceof Player)) return;
+
+        Player player = (Player) e.getEntity();
+
+        if(player.getHealth() - e.getFinalDamage() <= 0){
+            e.setCancelled(true);
+            spectatorManager.setPlayerAsSpectator(player);
+            gameManager.removePlayer(player);
+        }
+
     }
 
     @EventHandler

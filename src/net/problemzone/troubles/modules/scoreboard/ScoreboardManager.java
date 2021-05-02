@@ -48,4 +48,8 @@ public class ScoreboardManager {
         Objects.requireNonNull(board.getTeam("killCounter")).setPrefix(ChatColor.RED + "" + playerKills.get(player));
     }
 
+    public void removeScoreboard(Player player){
+        player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
+    }
+
 }
