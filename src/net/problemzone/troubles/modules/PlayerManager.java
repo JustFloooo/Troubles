@@ -1,8 +1,8 @@
-package net.problemzone.troubles.modules.player;
+package net.problemzone.troubles.modules;
 
 import net.problemzone.troubles.modules.game.Role;
-import net.problemzone.troubles.modules.scoreboard.ScoreboardManager;
-import net.problemzone.troubles.modules.spectator.SpectatorManager;
+import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
+import net.problemzone.troubles.modules.game.spectator.SpectatorManager;
 import net.problemzone.troubles.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;

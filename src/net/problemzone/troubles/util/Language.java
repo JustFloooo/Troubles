@@ -4,8 +4,13 @@ import org.bukkit.ChatColor;
 
 public enum Language {
     GAME_START("Das Spiel startet in: " + ChatColor.WHITE),
+    GAME_START_CANCEL("Der Spielstart wurde manuell " + ChatColor.RED+ "abgebrochen"),
     SERVER_CLOSE("Der Server schließt in: " + ChatColor.WHITE),
-    NOT_ENOUGH_PLAYERS("Es sind zu wenig Spieler auf dem Server!"),
+    NOT_ENOUGH_PLAYERS(ChatColor.RED + "Troubles benötigt mehr Spieler!"),
+    PLAYER_JOIN(ChatColor.GREEN + "» " + ChatColor.WHITE),
+    PLAYER_LEAVE(ChatColor.RED + "« " + ChatColor.WHITE),
+    PLAYERS_NEEDED("Es werden noch " + ChatColor.WHITE + "%d" + ChatColor.GRAY + " weitere Spieler benötigt!"),
+    PLAYERS_NEEDED_ONE("Es wird noch " + ChatColor.WHITE + "1" + ChatColor.GRAY + " weiterer Spieler benötigt!"),
     ROLE_ASSIGNED("Du bist ein %s" + ChatColor.GRAY +"!"),
     ROLE_WIN("Die %s " + ChatColor.GRAY + "haben gewonnen!"),
     INNOCENT_ROLE(ChatColor.GREEN + "Innocent"),

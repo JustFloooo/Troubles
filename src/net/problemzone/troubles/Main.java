@@ -1,15 +1,17 @@
 package net.problemzone.troubles;
 
+import net.problemzone.troubles.commands.cancel;
 import net.problemzone.troubles.commands.start;
 import net.problemzone.troubles.modules.game.GameListener;
 import net.problemzone.troubles.modules.game.GameManager;
-import net.problemzone.troubles.modules.items.ItemListener;
-import net.problemzone.troubles.modules.items.ItemManager;
-import net.problemzone.troubles.modules.player.PlayerManager;
-import net.problemzone.troubles.modules.scoreboard.ScoreboardListener;
-import net.problemzone.troubles.modules.scoreboard.ScoreboardManager;
-import net.problemzone.troubles.modules.spectator.SpectatorListener;
-import net.problemzone.troubles.modules.spectator.SpectatorManager;
+import net.problemzone.troubles.modules.game.items.ItemListener;
+import net.problemzone.troubles.modules.game.items.ItemManager;
+import net.problemzone.troubles.modules.PlayerManager;
+import net.problemzone.troubles.modules.WorldProtectionListener;
+import net.problemzone.troubles.modules.game.scoreboard.ScoreboardListener;
+import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
+import net.problemzone.troubles.modules.game.spectator.SpectatorListener;
+import net.problemzone.troubles.modules.game.spectator.SpectatorManager;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -53,6 +55,7 @@ public class Main extends JavaPlugin {
 
     private void registerCommands() {
         Objects.requireNonNull(getCommand("start")).setExecutor(new start(gameManager));
+        Objects.requireNonNull(getCommand("cancel")).setExecutor(new cancel(gameManager));
     }
 
     private void registerListeners() {
@@ -61,6 +64,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ItemListener(itemManager, spectatorManager, gameManager), this);
         getServer().getPluginManager().registerEvents(new SpectatorListener(spectatorManager, gameManager), this);
         getServer().getPluginManager().registerEvents(new GameListener(gameManager), this);
+        getServer().getPluginManager().registerEvents(new WorldProtectionListener(), this);
     }
 
 }

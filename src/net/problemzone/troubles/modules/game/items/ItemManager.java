@@ -1,4 +1,4 @@
-package net.problemzone.troubles.modules.items;
+package net.problemzone.troubles.modules.game.items;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

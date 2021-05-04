@@ -24,8 +24,8 @@ public class Packages {
     public static PacketContainer createPlayerNameColorPacket(List<Player> players, ChatColor color, String name) {
         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
 
-        //TODO: Friendly Fire Off??
-        //packet.getIntegers().write(1, 0);
+        //Friendly Fire On
+        packet.getIntegers().write(1, 1);
 
         //Team Name
         packet.getStrings().write(0, name);

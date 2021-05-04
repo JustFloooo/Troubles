@@ -6,41 +6,33 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Countdown {
 
-    public static void xpBarCountdown(int ticks, Language title) {
+    private final static Set<Integer> EXACT_CHAT_CALLS = new HashSet<>(Arrays.asList(60, 30, 20, 10, 5, 3, 2, 1));
 
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            player.setExp(1);
-            player.setLevel(ticks / 20);
-        });
+    private static BukkitTask levelCountdown;
+    private static BukkitTask xpBarCountdown;
+    private static BukkitTask chatCountdown;
 
-        final float division = 1F / ticks;
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Bukkit.getOnlinePlayers().forEach(player -> {
-                    if (player.getExp() <= division) {
-                        player.setExp(0);
-                        if (!this.isCancelled()) this.cancel();
-                    } else {
-                        player.setExp(player.getExp() - division);
-                    }
-                });
-            }
-        }.runTaskTimer(Main.getJavaPlugin(), 0, 1);
+    public static void createLevelCountdown(int seconds, Language title){
 
-        new BukkitRunnable() {
+        cancelLevelCountdown();
+
+        Bukkit.getOnlinePlayers().forEach(player -> player.setLevel(seconds));
+
+        levelCountdown = new BukkitRunnable() {
             @Override
             public void run() {
                 Bukkit.getOnlinePlayers().forEach(player -> {
                     if (player.getLevel() <= 0) {
-                        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
                         if (!this.isCancelled()) this.cancel();
                         return;
                     }
@@ -49,26 +41,71 @@ public class Countdown {
 
                     if (player.getLevel() <= 3) {
                         player.sendTitle(title.getText(), ChatColor.GREEN + "" + player.getLevel(), 0, 20, 0);
-                        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 0.5F);
                     }
                 });
             }
-        }.runTaskTimer(Main.getJavaPlugin(), 0, 20);
+        }.runTaskTimer(Main.getJavaPlugin(), 20, 20);
     }
 
-    public static void chatCountdown(int seconds, Set<Integer> exactCalls, Language title) {
-        AtomicInteger remaining = new AtomicInteger(seconds);
-        new BukkitRunnable() {
+    public static void createXpBarCountdown(int seconds) {
+
+        cancelXpBarCountdown();
+
+        Bukkit.getOnlinePlayers().forEach(player -> player.setExp(1));
+        final float division = 1F / (seconds*20);
+
+        xpBarCountdown = new BukkitRunnable() {
             @Override
             public void run() {
-                if (remaining.get() <= 0) this.cancel();
-                if (exactCalls.contains(remaining.get())) {
-                    Bukkit.broadcastMessage(title.getFormattedText() + remaining);
-                    Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 0.5F));
+                Bukkit.getOnlinePlayers().forEach(player -> {
+                    if (player.getExp() <= division) {
+                        if (!this.isCancelled()) this.cancel();
+                        player.setExp(0);
+                        return;
+                    }
+                    player.setExp(player.getExp() - division);
+                });
+            }
+        }.runTaskTimer(Main.getJavaPlugin(), 0, 1);
+    }
+
+    public static void createChatCountdown(int seconds, Language text) {
+
+        cancelChatCountdown();
+
+        AtomicInteger remaining = new AtomicInteger(seconds);
+        chatCountdown = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (remaining.get() <= 0){
+                    Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.AMBIENT, 1, 2F));
+                    if (!this.isCancelled()) this.cancel();
+                    return;
+                }
+                if (EXACT_CHAT_CALLS.contains(remaining.get())) {
+                    Bukkit.broadcastMessage(text.getFormattedText() + remaining);
+                    Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, SoundCategory.AMBIENT, 1, 1));
                 }
                 remaining.getAndDecrement();
             }
         }.runTaskTimer(Main.getJavaPlugin(), 0, 20);
+    }
+
+    public static void cancelLevelCountdown(){
+        if(levelCountdown==null)return;
+        if(!levelCountdown.isCancelled()) levelCountdown.cancel();
+        Bukkit.getOnlinePlayers().forEach(player -> player.setLevel(0));
+    }
+
+    public static void cancelXpBarCountdown(){
+        if(xpBarCountdown==null)return;
+        if(!xpBarCountdown.isCancelled()) xpBarCountdown.cancel();
+        Bukkit.getOnlinePlayers().forEach(player -> player.setExp(0));
+    }
+
+    public static void cancelChatCountdown(){
+        if(chatCountdown==null)return;
+        if(!chatCountdown.isCancelled()) chatCountdown.cancel();
     }
 
 }

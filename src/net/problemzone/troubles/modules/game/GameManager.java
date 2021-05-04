@@ -2,8 +2,8 @@ package net.problemzone.troubles.modules.game;
 
 import com.comphenix.protocol.events.PacketContainer;
 import net.problemzone.troubles.Main;
-import net.problemzone.troubles.modules.player.PlayerManager;
-import net.problemzone.troubles.modules.scoreboard.ScoreboardManager;
+import net.problemzone.troubles.modules.PlayerManager;
+import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.util.Countdown;
 import net.problemzone.troubles.util.Language;
 import net.problemzone.troubles.util.Packages;
@@ -13,20 +13,25 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
 public class GameManager {
 
-    private final int WARM_UP_TIME = 30;
-    private final int FINAL_LOBBY_TIME = 20;
-    private final int MIN_PLAYERS = 3;
+    private static final int STARTING_LOBBY_TIME = 60;
+    private static final int WARM_UP_TIME = 30;
+    private static final int FINAL_LOBBY_TIME = 20;
+    private static final int MIN_PLAYERS = 3;
 
     private final ScoreboardManager scoreboardManager;
     private final PlayerManager playerManager;
 
     private final Map<Player, Role> playerRoleMap = new HashMap<>();
     private List<Player> possiblePlayers;
+
+    private BukkitTask currentScheduledTask;
+
     private GameState gameState = GameState.WAITING;
 
     public GameManager(ScoreboardManager scoreboardManager, PlayerManager playerManager) {
@@ -35,27 +40,37 @@ public class GameManager {
     }
 
     public void initiateGame() {
-        initiateGame(WARM_UP_TIME);
+        initiateGame(STARTING_LOBBY_TIME);
     }
 
     //Starts Lobby Countdown
     public void initiateGame(int seconds) {
 
-        if(gameState != GameState.WAITING) return;
+        if(gameState != GameState.WAITING && gameState != GameState.STARTING) return;
 
         gameState = GameState.STARTING;
 
         //Initialize Countdown
-        Countdown.xpBarCountdown(seconds * 20, Language.GAME_START);
+        Countdown.createXpBarCountdown(seconds);
+        Countdown.createLevelCountdown(seconds, Language.GAME_START);
+        Countdown.createChatCountdown(seconds, Language.GAME_START);
 
-        //Set GameState to WarmUp
-        new BukkitRunnable() {
+        if(currentScheduledTask!=null && !currentScheduledTask.isCancelled()) currentScheduledTask.cancel();
+
+        currentScheduledTask = new BukkitRunnable() {
             @Override
             public void run() {
                 startWarmUp();
             }
         }.runTaskLater(Main.getJavaPlugin(), seconds * 20L);
 
+    }
+
+    public void cancelGameInitiation(){
+        Countdown.cancelXpBarCountdown();
+        Countdown.cancelLevelCountdown();
+        Countdown.cancelChatCountdown();
+        if(currentScheduledTask!=null && !currentScheduledTask.isCancelled()) currentScheduledTask.cancel();
     }
 
     //Starts Warm Up Phase
@@ -69,12 +84,12 @@ public class GameManager {
         possiblePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
 
         //Teleport to Map
-        Bukkit.getOnlinePlayers().forEach(playerManager::intiiateGame);
+        possiblePlayers.forEach(playerManager::intiiateGame);
 
         gameState = GameState.WARM_UP;
 
         //Initialize Countdown
-        Countdown.chatCountdown(WARM_UP_TIME, new HashSet<>(Arrays.asList(30, 15, 10, 5, 3, 2, 1)), Language.GAME_START);
+        Countdown.createChatCountdown(WARM_UP_TIME, Language.GAME_START);
 
         //Set GameState to Countdown
         new BukkitRunnable() {
@@ -92,7 +107,7 @@ public class GameManager {
             gameState = GameState.FINISHED;
 
             Bukkit.broadcastMessage(Language.NOT_ENOUGH_PLAYERS.getFormattedText());
-            Bukkit.getOnlinePlayers().forEach(playerManager::wrapUpGame);
+            possiblePlayers.forEach(playerManager::wrapUpGame);
             return;
         }
 
@@ -165,7 +180,7 @@ public class GameManager {
         Bukkit.broadcastMessage(String.format(Language.ROLE_WIN.getFormattedText(), role.getRoleName().getText()));
         Bukkit.getOnlinePlayers().forEach(player -> playerManager.announceWin(player, role));
 
-        Countdown.chatCountdown(FINAL_LOBBY_TIME * 20, new HashSet<>(Arrays.asList(10, 5, 3, 2, 1)), Language.SERVER_CLOSE);
+        Countdown.createChatCountdown(FINAL_LOBBY_TIME * 20, Language.SERVER_CLOSE);
 
         new BukkitRunnable() {
             @Override

@@ -1,4 +1,4 @@
-package net.problemzone.troubles.modules.spectator;
+package net.problemzone.troubles.modules.game.spectator;
 
 import net.problemzone.troubles.Main;
 import net.problemzone.troubles.modules.game.GameManager;

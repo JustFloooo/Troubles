@@ -1,8 +1,8 @@
-package net.problemzone.troubles.modules.items;
+package net.problemzone.troubles.modules.game.items;
 
 import net.problemzone.troubles.modules.game.GameManager;
 import net.problemzone.troubles.modules.game.GameState;
-import net.problemzone.troubles.modules.spectator.SpectatorManager;
+import net.problemzone.troubles.modules.game.spectator.SpectatorManager;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,19 +30,16 @@ public class ItemListener implements Listener {
 
                 //Chest Items
                 if (Objects.requireNonNull(e.getClickedBlock()).getType() == Material.CHEST) {
-                    e.setCancelled(true);
                     if (gameManager.getGameState() == GameState.WARM_UP || gameManager.getGameState() == GameState.RUNNING) {
                         if (itemManager.giveChestItemToPlayer(e.getPlayer())) e.getClickedBlock().setType(Material.AIR);
                     }
                 }
 
-                //Enderchest Item
+                //EC Item
                 if (Objects.requireNonNull(e.getClickedBlock()).getType() == Material.ENDER_CHEST) {
-                    e.setCancelled(true);
                     if (gameManager.getGameState() == GameState.RUNNING) {
                         if (itemManager.giveEnderItemToPlayer(e.getPlayer())) e.getClickedBlock().setType(Material.AIR);
                     }
-
                 }
             }
         }

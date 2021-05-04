@@ -1,4 +1,4 @@
-package net.problemzone.troubles.modules.scoreboard;
+package net.problemzone.troubles.modules.game.scoreboard;
 
 import net.problemzone.troubles.modules.game.Role;
 import org.bukkit.Bukkit;

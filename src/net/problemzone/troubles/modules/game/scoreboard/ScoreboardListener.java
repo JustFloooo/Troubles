@@ -1,4 +1,4 @@
-package net.problemzone.troubles.modules.scoreboard;
+package net.problemzone.troubles.modules.game.scoreboard;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
