@@ -22,7 +22,7 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent e){
+    public void onPlayerLeave(PlayerQuitEvent e) {
         //General Settings
         e.setQuitMessage("");
         gameManager.removePlayer(e.getPlayer());
@@ -46,7 +46,7 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e){
+    public void onPlayerJoin(PlayerJoinEvent e) {
         //General Settings
         e.setJoinMessage("");
         e.getPlayer().teleport(e.getPlayer().getWorld().getSpawnLocation());
@@ -55,7 +55,9 @@ public class GameListener implements Listener {
         if (gameManager.getGameState() != GameState.WAITING && gameManager.getGameState() != GameState.STARTING) return;
         e.setJoinMessage(Language.PLAYER_JOIN.getText() + e.getPlayer().getDisplayName());
 
-        if (Bukkit.getOnlinePlayers().size() < PLAYER_START_COUNT){
+        if (gameManager.getGameState() != GameState.WAITING) return;
+
+        if (Bukkit.getOnlinePlayers().size() < PLAYER_START_COUNT) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -64,7 +66,8 @@ public class GameListener implements Listener {
             }.runTaskLater(Main.getJavaPlugin(), 5);
             return;
         }
-        if (Bukkit.getOnlinePlayers().size() >= PLAYER_START_COUNT && gameManager.getGameState() == GameState.WAITING)  gameManager.initiateGame();
+
+        gameManager.initiateGame();
     }
 
     @EventHandler

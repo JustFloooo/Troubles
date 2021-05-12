@@ -29,7 +29,6 @@ public class GameManager {
 
     private final Map<Player, Role> playerRoleMap = new HashMap<>();
     private List<Player> possiblePlayers;
-
     private BukkitTask currentScheduledTask;
 
     private GameState gameState = GameState.WAITING;
@@ -46,16 +45,16 @@ public class GameManager {
     //Starts Lobby Countdown
     public void initiateGame(int seconds) {
 
-        if(gameState != GameState.WAITING && gameState != GameState.STARTING) return;
+        if (gameState != GameState.WAITING && gameState != GameState.STARTING) return;
 
         gameState = GameState.STARTING;
 
         //Initialize Countdown
         Countdown.createXpBarCountdown(seconds);
-        Countdown.createLevelCountdown(seconds, Language.GAME_START);
+        Countdown.createLevelCountdown(seconds, Language.GAME_START_TITLE);
         Countdown.createChatCountdown(seconds, Language.GAME_START);
 
-        if(currentScheduledTask!=null && !currentScheduledTask.isCancelled()) currentScheduledTask.cancel();
+        if (currentScheduledTask != null && !currentScheduledTask.isCancelled()) currentScheduledTask.cancel();
 
         currentScheduledTask = new BukkitRunnable() {
             @Override
@@ -66,11 +65,11 @@ public class GameManager {
 
     }
 
-    public void cancelGameInitiation(){
+    public void cancelGameInitiation() {
         Countdown.cancelXpBarCountdown();
         Countdown.cancelLevelCountdown();
         Countdown.cancelChatCountdown();
-        if(currentScheduledTask!=null && !currentScheduledTask.isCancelled()) currentScheduledTask.cancel();
+        if (currentScheduledTask != null && !currentScheduledTask.isCancelled()) currentScheduledTask.cancel();
     }
 
     //Starts Warm Up Phase
@@ -89,7 +88,7 @@ public class GameManager {
         gameState = GameState.WARM_UP;
 
         //Initialize Countdown
-        Countdown.createChatCountdown(WARM_UP_TIME, Language.GAME_START);
+        Countdown.createChatCountdown(WARM_UP_TIME, Language.WARM_UP);
 
         //Set GameState to Countdown
         new BukkitRunnable() {
@@ -135,7 +134,7 @@ public class GameManager {
             tellRoleToPlayer(player, playerRoleMap.get(player));
             Packages.sendPacket(player, detectiveNames);
             //Packages.sendPacket(player, detectiveArmor.toArray(PacketContainer[]::new));
-            if(playerRoleMap.get(player) == Role.TRAITOR){
+            if (playerRoleMap.get(player) == Role.TRAITOR) {
                 Packages.sendPacket(player, traitorNames);
                 //Packages.sendPacket(player, traitorArmor.toArray(PacketContainer[]::new));
             }
@@ -152,12 +151,11 @@ public class GameManager {
         scoreboardManager.setScoreboard(player, role);
     }
 
-
     //Winning Related Methods
     public void removePlayer(Player player) {
         possiblePlayers.remove(player);
         playerRoleMap.remove(player);
-        if(gameState == GameState.RUNNING) checkForWin();
+        if (gameState == GameState.RUNNING) checkForWin();
     }
 
     private void checkForWin() {
@@ -191,6 +189,9 @@ public class GameManager {
 
     }
 
+    public Role getPlayerRole(Player player) {
+        return playerRoleMap.get(player);
+    }
 
     //Public getter methods
     public GameState getGameState() {

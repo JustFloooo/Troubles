@@ -2,16 +2,18 @@ package net.problemzone.troubles;
 
 import net.problemzone.troubles.commands.cancel;
 import net.problemzone.troubles.commands.start;
+import net.problemzone.troubles.modules.PlayerManager;
+import net.problemzone.troubles.modules.WorldProtectionListener;
 import net.problemzone.troubles.modules.game.GameListener;
 import net.problemzone.troubles.modules.game.GameManager;
 import net.problemzone.troubles.modules.game.items.ItemListener;
 import net.problemzone.troubles.modules.game.items.ItemManager;
-import net.problemzone.troubles.modules.PlayerManager;
-import net.problemzone.troubles.modules.WorldProtectionListener;
 import net.problemzone.troubles.modules.game.scoreboard.ScoreboardListener;
 import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.modules.game.spectator.SpectatorListener;
 import net.problemzone.troubles.modules.game.spectator.SpectatorManager;
+import net.problemzone.troubles.modules.game.tester.TesterListener;
+import net.problemzone.troubles.modules.game.tester.TesterManager;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +27,7 @@ public class Main extends JavaPlugin {
     private final ItemManager itemManager = new ItemManager();
     private final SpectatorManager spectatorManager = new SpectatorManager();
     private final PlayerManager playerManager = new PlayerManager(scoreboardManager, spectatorManager);
+    private final TesterManager testerManager = new TesterManager();
 
     private final GameManager gameManager = new GameManager(scoreboardManager, playerManager);
 
@@ -63,6 +66,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ScoreboardListener(scoreboardManager), this);
         getServer().getPluginManager().registerEvents(new ItemListener(itemManager, spectatorManager, gameManager), this);
         getServer().getPluginManager().registerEvents(new SpectatorListener(spectatorManager, gameManager), this);
+        getServer().getPluginManager().registerEvents(new TesterListener(testerManager, gameManager), this);
         getServer().getPluginManager().registerEvents(new GameListener(gameManager), this);
         getServer().getPluginManager().registerEvents(new WorldProtectionListener(), this);
     }
