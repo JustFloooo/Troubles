@@ -153,7 +153,7 @@ public class GameManager {
 
     //Winning Related Methods
     public void removePlayer(Player player) {
-        possiblePlayers.remove(player);
+        if(possiblePlayers != null) possiblePlayers.remove(player);
         playerRoleMap.remove(player);
         if (gameState == GameState.RUNNING) checkForWin();
     }

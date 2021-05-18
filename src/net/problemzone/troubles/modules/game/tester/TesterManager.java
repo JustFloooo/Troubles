@@ -18,14 +18,16 @@ import java.util.List;
 public class TesterManager {
 
     private static final int TESTING_TIME = 5;
+    private static final int DISPLAY_TIME = 2;
     private static final double FAILURE_CHANCE = 0.1;
 
     private Tester tester;
-    private TesterState testerState;
+    private TesterState testerState = TesterState.IDLE;
 
     public void testPlayer(Player player, Role role) {
 
-        closeTester();
+        testerState = TesterState.TESTING;
+        tester.getRow().forEach(block -> block.setType(Material.WHITE_STAINED_GLASS));
         Bukkit.broadcastMessage(String.format(Language.TESTER.getFormattedText(), player.getDisplayName()));
         player.teleport(tester.getMiddle());
 
@@ -39,25 +41,26 @@ public class TesterManager {
         }.runTaskLater(Main.getJavaPlugin(), TESTING_TIME * 20L);
     }
 
-    private void openTester() {
-        testerState = TesterState.IDLE;
-        tester.getRow().forEach(block -> block.setType(Material.AIR));
-    }
-
-    private void closeTester() {
-        testerState = TesterState.TESTING;
-        tester.getRow().forEach(block -> block.setType(Material.WHITE_STAINED_GLASS_PANE));
-    }
-
     private void revealTest(Role role) {
 
-        if(Math.random() < FAILURE_CHANCE || role != Role.TRAITOR){
+        if (Math.random() < FAILURE_CHANCE || role != Role.TRAITOR) {
             tester.getLights().forEach(block -> block.setType(Material.GREEN_STAINED_GLASS));
         } else {
             tester.getLights().forEach(block -> block.setType(Material.RED_STAINED_GLASS));
         }
 
-        openTester();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                openTester();
+            }
+        }.runTaskLater(Main.getJavaPlugin(), DISPLAY_TIME * 20L);
+    }
+
+    private void openTester() {
+        testerState = TesterState.IDLE;
+        tester.getRow().forEach(block -> block.setType(Material.AIR));
+        tester.getLights().forEach(block -> block.setType(Material.WHITE_STAINED_GLASS));
     }
 
 
@@ -83,7 +86,7 @@ public class TesterManager {
 
     //Public Getter
     public boolean isTester(Block button) {
-        return hasTester() && tester.getButton() == button;
+        return hasTester() && tester.getButton().getLocation().equals(button.getLocation());
     }
 
     public boolean hasTester() {

@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 
 public enum Language {
     GAME_START("Das Spiel startet in: " + ChatColor.YELLOW + "%d" + ChatColor.GRAY + " Sekunden"),
-    GAME_START_TITLE("Troubles startet in: " + ChatColor.WHITE),
+    GAME_START_TITLE(ChatColor.RED + "Troubles " + ChatColor.GRAY + "startet in: " + ChatColor.WHITE),
     GAME_START_CANCEL("Der Spielstart wurde manuell " + ChatColor.RED + "abgebrochen"),
     WARM_UP("Die Schutzzeit endet in " + ChatColor.YELLOW + "%d" + ChatColor.GRAY + " Sekunden"),
     SERVER_CLOSE(ChatColor.RED + "Der Server schließt in: " + ChatColor.YELLOW + "%d" + ChatColor.RED + " Sekunden"),

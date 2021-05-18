@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Countdown {
 
-    private final static Set<Integer> EXACT_CHAT_CALLS = new HashSet<>(Arrays.asList(60, 30, 20, 10, 5, 3, 2, 1));
-    private final static int XP_BAR_TICK_SPEED = 4;
+    private static final Set<Integer> EXACT_CHAT_CALLS = new HashSet<>(Arrays.asList(60, 30, 20, 10, 5, 3, 2, 1));
+    private static final int XP_BAR_TICK_SPEED = 4;
 
     private static BukkitTask levelCountdown;
     private static BukkitTask xpBarCountdown;
@@ -84,7 +84,7 @@ public class Countdown {
                     return;
                 }
                 if (EXACT_CHAT_CALLS.contains(remaining.get())) {
-                    Bukkit.broadcastMessage(String.format(text.getFormattedText(), remaining));
+                    Bukkit.broadcastMessage(String.format(text.getFormattedText(), remaining.get()));
                     Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, SoundCategory.AMBIENT, 1, 1));
                 }
                 remaining.getAndDecrement();
