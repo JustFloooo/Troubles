@@ -18,6 +18,8 @@ public class ScoreboardListener implements Listener {
     @EventHandler
     public void scoreboardPlayerDeath(PlayerDeathEvent event) {
 
+        //TODO: EntityDamageByEntityEvent cast from EntityDamageEvent oder so?
+
         if(Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             if (event.getEntity().getKiller() != null) {
                 scoreboardManager.increaseKillCounter(event.getEntity().getKiller());

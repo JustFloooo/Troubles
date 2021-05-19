@@ -12,8 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameListener implements Listener {
 
-    //TODO: Set to 6
-    private static final int PLAYER_START_COUNT = 3;
+    private static final int PLAYER_START_COUNT = 5;
 
     private final GameManager gameManager;
 
