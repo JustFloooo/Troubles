@@ -6,7 +6,7 @@ import net.problemzone.troubles.modules.PlayerManager;
 import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.util.Countdown;
 import net.problemzone.troubles.util.Language;
-import net.problemzone.troubles.util.Packages;
+import net.problemzone.troubles.util.NMSPackets;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -124,18 +124,18 @@ public class GameManager {
         possiblePlayers.subList(traitor_count + detective_count, possiblePlayers.size()).forEach(player -> playerRoleMap.put(player, Role.INNOCENT));
 
         //Create Name and Armor Packages
-        PacketContainer traitorNames = Packages.createPlayerNameColorPacket(traitors, ChatColor.RED, "traitors");
-        PacketContainer detectiveNames = Packages.createPlayerNameColorPacket(detectives, ChatColor.BLUE, "detectives");
+        PacketContainer traitorNames = NMSPackets.createPlayerNameColorPacket(traitors, ChatColor.RED, "traitors");
+        PacketContainer detectiveNames = NMSPackets.createPlayerNameColorPacket(detectives, ChatColor.BLUE, "detectives");
         //List<PacketContainer> traitorArmor = Packages.createFakeArmorPacket(traitors, Color.RED);
         //List<PacketContainer> detectiveArmor = Packages.createFakeArmorPacket(traitors, Color.BLUE);
 
         //Send Packages to players
         playerRoleMap.keySet().forEach(player -> {
             tellRoleToPlayer(player, playerRoleMap.get(player));
-            Packages.sendPacket(player, detectiveNames);
+            NMSPackets.sendPacket(player, detectiveNames);
             //Packages.sendPacket(player, detectiveArmor.toArray(PacketContainer[]::new));
             if (playerRoleMap.get(player) == Role.TRAITOR) {
-                Packages.sendPacket(player, traitorNames);
+                NMSPackets.sendPacket(player, traitorNames);
                 //Packages.sendPacket(player, traitorArmor.toArray(PacketContainer[]::new));
             }
         });

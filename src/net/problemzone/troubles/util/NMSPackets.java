@@ -4,22 +4,20 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.utility.MinecraftReflection;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class Packages {
+public class NMSPackets {
 
     public static PacketContainer createPlayerNameColorPacket(List<Player> players, ChatColor color, String name) {
         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM);
@@ -53,7 +51,7 @@ public class Packages {
         leatherArmor.setItemMeta(leatherArmorMeta);
 
         //Create Armor Package for each given player
-        for(Player player : players){
+        for (Player player : players) {
             PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
 
             //Entity ID
@@ -69,6 +67,65 @@ public class Packages {
         }
 
         return packets;
+    }
+
+    public static PacketContainer createHumanSpawnPacket(int id, UUID uuid, Location loc) {
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
+
+        //Entity ID
+        packet.getIntegers().write(0, id);
+
+        //UUID
+        packet.getUUIDs().write(0, uuid);
+
+        //Coordinates
+        packet.getDoubles().write(0, loc.getX());
+        packet.getDoubles().write(1, loc.getY());
+        packet.getDoubles().write(2, loc.getZ());
+
+        //Angles
+        packet.getBytes().write(0, (byte) loc.getYaw());
+        packet.getBytes().write(1, (byte) loc.getPitch());
+
+        return packet;
+    }
+
+    public static PacketContainer createPlayerInfoPacket(EnumWrappers.PlayerInfoAction action, WrappedGameProfile profile) {
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
+
+        //Player Info Action
+        packet.getPlayerInfoAction().write(0, action);
+
+        //Player Info Data
+        List<PlayerInfoData> playerInfoData = Collections.singletonList(new PlayerInfoData(profile, -1, EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText("[CR]")));
+        packet.getPlayerInfoDataLists().write(0, playerInfoData);
+
+        return packet;
+    }
+
+    public static PacketContainer createEntityMoveDownPacket(int id) {
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.REL_ENTITY_MOVE);
+
+        //Entity ID
+        packet.getIntegers().write(0, id);
+
+        //Y Change
+        packet.getShorts().write(1, (short) (-61.8));
+
+        return packet;
+
+    }
+
+    public static PacketContainer createPlayerMetadataPacket(int id, List<WrappedWatchableObject> metadata) {
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
+
+        //Entity ID
+        packet.getIntegers().write(0, id);
+
+        //Metadata
+        packet.getWatchableCollectionModifier().write(0, metadata);
+
+        return packet;
     }
 
     public static void sendPacket(Player player, PacketContainer... packets) {
