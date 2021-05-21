@@ -27,6 +27,7 @@ public class TesterListener implements Listener {
 
         if (gameManager.getGameState() != GameState.RUNNING) return;
         if (testerManager.getTesterState() != TesterState.IDLE) return;
+        if (gameManager.getPlayerRole(e.getPlayer()) == null) return;
 
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (Objects.requireNonNull(e.getClickedBlock()).getType() != Material.POLISHED_BLACKSTONE_BUTTON) return;

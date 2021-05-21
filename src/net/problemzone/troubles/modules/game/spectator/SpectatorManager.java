@@ -19,6 +19,7 @@ public class SpectatorManager {
         player.getInventory().clear();
         player.teleport(player.getWorld().getSpawnLocation());
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
+        player.setArrowsInBody(0);
 
         player.setPlayerListName(ChatColor.GRAY + player.getName() + ChatColor.RED + " ✗");
 
@@ -41,4 +42,7 @@ public class SpectatorManager {
         return spectators.contains(player);
     }
 
+    public List<Player> getSpectators() {
+        return spectators;
+    }
 }

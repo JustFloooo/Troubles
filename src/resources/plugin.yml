@@ -1,5 +1,5 @@
 main: net.problemzone.troubles.Main
-version: 0.3
+version: 0.4
 name: Troubles
 authors: [JustFloooo]
 depend: [ProtocolLib]
@@ -13,3 +13,7 @@ commands:
     description: Cancels the Countdown
     usage: /cancel
     permission: troubles.command.cancel
+  scorpse:
+    description: scorpse
+    usage: /scorpse
+    permission: troubles.command.scorpse

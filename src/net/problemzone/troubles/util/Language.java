@@ -21,7 +21,13 @@ public enum Language {
     INNOCENT_DESCRIPTION("Versuche nicht zu sterben!"),
     DETECTIVE_DESCRIPTION("Finde die Mörder!"),
     TRAITOR_DESCIRPTION("Bringe deine Gegner um!"),
-    TESTER(ChatColor.WHITE + "%s" + ChatColor.GRAY + " hat den Tester betreten!");
+    TESTER(ChatColor.WHITE + "%s" + ChatColor.GRAY + " hat den Tester betreten!"),
+    KILLER_SLAIN("Du hast " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " abgeschlachtet"),
+    KILLER_SHOT("Du hast " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " erschossen"),
+    KILLER_FIST("Du hast " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " rektal bis zum Tode gefistet"),
+    VICTIM_SLAIN("Du wurdest von " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " umgebracht"),
+    VICTIM_SHOT("Du wurdest von " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " erschossen"),
+    SPECTATOR_MESSAGE("%s : %s");
 
     private static final String SYSTEM_PREFIX = ChatColor.RED + "Troubles " + ChatColor.DARK_GRAY + "» ";
 

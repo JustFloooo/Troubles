@@ -1,6 +1,7 @@
 package net.problemzone.troubles.modules.game;
 
 import net.problemzone.troubles.Main;
+import net.problemzone.troubles.modules.game.spectator.SpectatorManager;
 import net.problemzone.troubles.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -15,19 +16,22 @@ public class GameListener implements Listener {
     private static final int PLAYER_START_COUNT = 5;
 
     private final GameManager gameManager;
+    private final SpectatorManager spectatorManager;
 
-    public GameListener(GameManager gameManager) {
+    public GameListener(GameManager gameManager, SpectatorManager spectatorManager) {
         this.gameManager = gameManager;
+        this.spectatorManager = spectatorManager;
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {
+
         //General Settings
         e.setQuitMessage("");
         gameManager.removePlayer(e.getPlayer());
 
         //Lobby Settings
-        if (gameManager.getGameState() != GameState.WAITING && gameManager.getGameState() != GameState.STARTING) return;
+        if(spectatorManager.isSpectator(e.getPlayer())) return;
         e.setQuitMessage(Language.PLAYER_LEAVE.getText() + e.getPlayer().getDisplayName());
 
         if (Bukkit.getOnlinePlayers().size() >= PLAYER_START_COUNT) return;

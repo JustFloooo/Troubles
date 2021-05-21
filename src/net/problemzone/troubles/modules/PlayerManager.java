@@ -7,6 +7,7 @@ import net.problemzone.troubles.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -21,13 +22,14 @@ public class PlayerManager {
         this.spectatorManager = spectatorManager;
     }
 
-    public void intiiateGame(Player player){
+    public void initiatePlayer(Player player){
         //TODO: Choose World
         player.teleport(Objects.requireNonNull(Bukkit.getWorld("Skeld")).getSpawnLocation());
     }
 
     public void wrapUpGame(Player player){
         player.getInventory().clear();
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
         scoreboardManager.removeScoreboard(player);
         spectatorManager.removePlayerFromSpectator(player);
         player.teleport(Objects.requireNonNull(Bukkit.getWorld("Lobby")).getSpawnLocation());

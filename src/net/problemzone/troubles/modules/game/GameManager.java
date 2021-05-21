@@ -83,7 +83,7 @@ public class GameManager {
         possiblePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
 
         //Teleport to Map
-        possiblePlayers.forEach(playerManager::intiiateGame);
+        possiblePlayers.forEach(playerManager::initiatePlayer);
 
         gameState = GameState.WARM_UP;
 
@@ -178,7 +178,7 @@ public class GameManager {
         Bukkit.broadcastMessage(String.format(Language.ROLE_WIN.getFormattedText(), role.getRoleName().getText()));
         Bukkit.getOnlinePlayers().forEach(player -> playerManager.announceWin(player, role));
 
-        Countdown.createChatCountdown(FINAL_LOBBY_TIME * 20, Language.SERVER_CLOSE);
+        Countdown.createChatCountdown(FINAL_LOBBY_TIME, Language.SERVER_CLOSE);
 
         new BukkitRunnable() {
             @Override
