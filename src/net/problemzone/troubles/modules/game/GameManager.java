@@ -148,7 +148,7 @@ public class GameManager {
         player.sendMessage(String.format(Language.ROLE_ASSIGNED.getFormattedText(), role.getRoleName().getText()) + " " + ChatColor.GRAY + role.getRoleDescription().getText());
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
 
-        scoreboardManager.setScoreboard(player, role);
+        scoreboardManager.setGameScoreboard(player, role);
     }
 
     //Winning Related Methods

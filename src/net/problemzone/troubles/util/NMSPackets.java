@@ -40,6 +40,21 @@ public class NMSPackets {
         return packet;
     }
 
+    public static PacketContainer createScoreboardTeamPacket(String uuid){
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+
+        //Team Name
+        packet.getStrings().write(0, "invisible");
+
+        //Name Tag Visibility
+        packet.getStrings().write(1, "never");
+
+        //Team Members
+        packet.getSpecificModifier(Collection.class).write(0, Collections.singletonList(uuid));
+
+        return packet;
+    }
+
     public static List<PacketContainer> createFakeArmorPacket(List<Player> players, Color color) {
         List<PacketContainer> packets = new ArrayList<>();
 

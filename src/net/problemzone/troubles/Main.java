@@ -26,8 +26,8 @@ public class Main extends JavaPlugin {
 
     private static JavaPlugin javaPlugin;
 
-    private final CorpseManager corpseManager = new CorpseManager();
     private final ScoreboardManager scoreboardManager = new ScoreboardManager();
+    private final CorpseManager corpseManager = new CorpseManager(scoreboardManager);
     private final ItemManager itemManager = new ItemManager();
     private final SpectatorManager spectatorManager = new SpectatorManager();
     private final PlayerManager playerManager = new PlayerManager(scoreboardManager, spectatorManager);
@@ -65,6 +65,7 @@ public class Main extends JavaPlugin {
     }
 
     private void registerCommands() {
+        //Commands
         Objects.requireNonNull(getCommand("start")).setExecutor(new start(gameManager));
         Objects.requireNonNull(getCommand("cancel")).setExecutor(new cancel(gameManager));
         Objects.requireNonNull(getCommand("scorpse")).setExecutor(new scorpse(corpseManager));

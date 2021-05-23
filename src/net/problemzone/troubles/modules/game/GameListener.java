@@ -5,6 +5,7 @@ import net.problemzone.troubles.modules.game.spectator.SpectatorManager;
 import net.problemzone.troubles.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -73,7 +74,7 @@ public class GameListener implements Listener {
         gameManager.initiateGame();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     //Disable PVP until Game
     public void preGameDamageListener(EntityDamageEvent e) {
         if (gameManager.getGameState() == GameState.RUNNING) return;

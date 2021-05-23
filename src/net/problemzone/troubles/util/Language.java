@@ -3,6 +3,7 @@ package net.problemzone.troubles.util;
 import org.bukkit.ChatColor;
 
 public enum Language {
+
     GAME_START("Das Spiel startet in: " + ChatColor.YELLOW + "%d" + ChatColor.GRAY + " Sekunden"),
     GAME_START_TITLE(ChatColor.RED + "Troubles " + ChatColor.GRAY + "startet in: " + ChatColor.WHITE),
     GAME_START_CANCEL("Der Spielstart wurde manuell " + ChatColor.RED + "abgebrochen"),

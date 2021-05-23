@@ -7,6 +7,7 @@ import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_16_R3.*;
 import net.problemzone.troubles.Main;
+import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.util.NMSPackets;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,7 +27,13 @@ public class CorpseManager {
 
     private static final int REMOVE_TIMER = 2;
 
+    private final ScoreboardManager scoreboardManager;
+
     private final List<CorpseData> corpses = new ArrayList<>();
+
+    public CorpseManager(ScoreboardManager scoreboardManager) {
+        this.scoreboardManager = scoreboardManager;
+    }
 
     public static DataWatcher clonePlayerDatawatcher(Player player, int currentEntId) {
 
@@ -77,8 +84,7 @@ public class CorpseManager {
     public CorpseData spawnCorpse(Player p, Location loc) {
         int entityId = getNextEntityIdAtomic().get();
 
-
-        WrappedGameProfile prof = cloneProfileWithRandomUUID(WrappedGameProfile.fromPlayer(p), p.getDisplayName());
+        WrappedGameProfile prof = cloneProfileWithRandomUUID(WrappedGameProfile.fromPlayer(p), "");
 
         DataWatcher dw = clonePlayerDatawatcher(p, entityId);
 
@@ -140,7 +146,7 @@ public class CorpseManager {
 
     }
 
-    public static class CorpseData {
+    public class CorpseData {
 
         private final WrappedGameProfile prof;
         private final Location loc;
@@ -175,6 +181,7 @@ public class CorpseManager {
             PacketContainer spawnPacket = NMSPackets.createHumanSpawnPacket(entityId, prof.getUUID(), loc);
             PacketContainer movePacket = NMSPackets.createEntityMoveDownPacket(entityId);
             PacketContainer addInfoPacket = NMSPackets.createPlayerInfoPacket(EnumWrappers.PlayerInfoAction.ADD_PLAYER, prof);
+            PacketContainer nameTagPacket = NMSPackets.createScoreboardTeamPacket("");
             PacketContainer removeInfoPacket = NMSPackets.createPlayerInfoPacket(EnumWrappers.PlayerInfoAction.REMOVE_PLAYER, prof);
 
             Location bedLocation = bedLocation(loc);
@@ -183,6 +190,7 @@ public class CorpseManager {
             NMSPackets.sendPacket(p, addInfoPacket);
             NMSPackets.sendPacket(p, spawnPacket);
             NMSPackets.sendPacket(p, movePacket);
+            NMSPackets.sendPacket(p, nameTagPacket);
 
             List<WrappedWatchableObject> wrappedWatchableObjectList = Collections.singletonList(new WrappedWatchableObject(0, (byte) 0x01));
             Bukkit.broadcastMessage("CHECK");

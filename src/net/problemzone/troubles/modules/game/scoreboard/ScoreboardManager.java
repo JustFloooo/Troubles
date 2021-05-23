@@ -15,7 +15,7 @@ public class ScoreboardManager {
 
     private final Map<Player, Integer> playerKills = new HashMap<>();
 
-    public void setScoreboard(Player player, Role role) {
+    public void setGameScoreboard(Player player, Role role) {
 
         Scoreboard board = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
         Objective obj = board.registerNewObjective("Infos", "dummy", ChatColor.RED + "TROUBLES");
@@ -50,6 +50,15 @@ public class ScoreboardManager {
 
     public void removeScoreboard(Player player){
         player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
+    }
+
+    public void setInvisibleNametag(String entry){
+        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
+
+        Team team = scoreboard.registerNewTeam("invisible");
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        team.addEntry(entry);
     }
 
 }
