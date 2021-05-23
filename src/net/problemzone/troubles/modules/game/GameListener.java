@@ -35,6 +35,8 @@ public class GameListener implements Listener {
         if(spectatorManager.isSpectator(e.getPlayer())) return;
         e.setQuitMessage(Language.PLAYER_LEAVE.getText() + e.getPlayer().getDisplayName());
 
+        if (gameManager.getGameState() != GameState.WAITING && gameManager.getGameState() != GameState.STARTING) return;
+
         if (Bukkit.getOnlinePlayers().size() >= PLAYER_START_COUNT) return;
         new BukkitRunnable() {
             @Override
@@ -43,9 +45,7 @@ public class GameListener implements Listener {
             }
         }.runTaskLater(Main.getJavaPlugin(), 5);
 
-
-        if (gameManager.getGameState() != GameState.STARTING) return;
-        gameManager.cancelGameInitiation();
+        if (gameManager.getGameState() == GameState.STARTING) gameManager.cancelGameInitiation();
 
     }
 

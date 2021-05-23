@@ -29,7 +29,7 @@ public class Main extends JavaPlugin {
     private final ScoreboardManager scoreboardManager = new ScoreboardManager();
     private final CorpseManager corpseManager = new CorpseManager(scoreboardManager);
     private final ItemManager itemManager = new ItemManager();
-    private final SpectatorManager spectatorManager = new SpectatorManager();
+    private final SpectatorManager spectatorManager = new SpectatorManager(scoreboardManager);
     private final PlayerManager playerManager = new PlayerManager(scoreboardManager, spectatorManager);
     private final TesterManager testerManager = new TesterManager();
 

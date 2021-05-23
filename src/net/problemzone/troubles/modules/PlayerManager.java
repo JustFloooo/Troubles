@@ -4,9 +4,8 @@ import net.problemzone.troubles.modules.game.Role;
 import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.modules.game.spectator.SpectatorManager;
 import net.problemzone.troubles.util.Language;
+import net.problemzone.troubles.util.Sounds;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
@@ -24,6 +23,10 @@ public class PlayerManager {
 
     public void initiatePlayer(Player player){
         //TODO: Choose World
+        player.getInventory().clear();
+        player.setExp(0);
+        player.setLevel(0);
+        player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
         player.teleport(Objects.requireNonNull(Bukkit.getWorld("Skeld")).getSpawnLocation());
     }
 
@@ -37,7 +40,12 @@ public class PlayerManager {
 
     public void announceWin(Player player, Role role){
         player.sendTitle(String.format(Language.ROLE_WIN.getText(), role.getRoleName().getText()), "", 10, 60, 10);
-        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.AMBIENT, 1, role == Role.TRAITOR ? 0.8F : 1.3F);
+        if (role == Role.TRAITOR) Sounds.GAME_WIN_TRAITOR.playSoundForPlayer(player);
+        else Sounds.GAME_WIN_INNO.playSoundForPlayer(player);
+    }
+
+    public void sendPlayerToHub(Player player){
+        player.performCommand("/hub");
     }
 
 }

@@ -7,10 +7,9 @@ import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.util.Countdown;
 import net.problemzone.troubles.util.Language;
 import net.problemzone.troubles.util.NMSPackets;
+import net.problemzone.troubles.util.Sounds;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -22,7 +21,7 @@ public class GameManager {
     private static final int STARTING_LOBBY_TIME = 60;
     private static final int WARM_UP_TIME = 30;
     private static final int FINAL_LOBBY_TIME = 20;
-    private static final int MIN_PLAYERS = 3;
+    private static final int MIN_PLAYERS = 2;
 
     private final ScoreboardManager scoreboardManager;
     private final PlayerManager playerManager;
@@ -70,6 +69,7 @@ public class GameManager {
         Countdown.cancelLevelCountdown();
         Countdown.cancelChatCountdown();
         if (currentScheduledTask != null && !currentScheduledTask.isCancelled()) currentScheduledTask.cancel();
+        gameState = GameState.WAITING;
     }
 
     //Starts Warm Up Phase
@@ -79,6 +79,9 @@ public class GameManager {
             gameState = GameState.WAITING;
             return;
         }
+
+        //Disable Lobby Plugin
+        if(Bukkit.getPluginManager().getPlugin("Lobbibi") != null) Bukkit.getPluginManager().disablePlugin(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Lobbibi")));
 
         possiblePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
 
@@ -146,7 +149,7 @@ public class GameManager {
     public void tellRoleToPlayer(Player player, Role role) {
         player.sendTitle(role.getRoleName().getText(), role.getRoleDescription().getText(), 10, 60, 10);
         player.sendMessage(String.format(Language.ROLE_ASSIGNED.getFormattedText(), role.getRoleName().getText()) + " " + ChatColor.GRAY + role.getRoleDescription().getText());
-        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 1, 1F);
+        Sounds.RECEIVE_ROLE.playSoundForPlayer(player);
 
         scoreboardManager.setGameScoreboard(player, role);
     }
@@ -183,6 +186,7 @@ public class GameManager {
         new BukkitRunnable() {
             @Override
             public void run() {
+                Bukkit.getOnlinePlayers().forEach(playerManager::sendPlayerToHub);
                 Bukkit.getServer().shutdown();
             }
         }.runTaskLater(Main.getJavaPlugin(), FINAL_LOBBY_TIME * 20L + 1);

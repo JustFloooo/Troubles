@@ -1,13 +1,11 @@
 package net.problemzone.troubles.modules.game.spectator;
 
-import net.problemzone.troubles.Main;
 import net.problemzone.troubles.modules.game.GameManager;
 import net.problemzone.troubles.modules.game.GameState;
 import net.problemzone.troubles.modules.game.corpses.CorpseManager;
 import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.util.Language;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
+import net.problemzone.troubles.util.Sounds;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,8 +16,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpectatorListener implements Listener {
 
@@ -37,22 +33,9 @@ public class SpectatorListener implements Listener {
 
     @EventHandler
     public void onSpectatorJoin(PlayerJoinEvent e) {
-        if (gameManager.getGameState() != GameState.WAITING && gameManager.getGameState() != GameState.STARTING) {
-            spectatorManager.setPlayerAsSpectator(e.getPlayer());
-        }
-    }
+        if (gameManager.getGameState() != GameState.WARM_UP && gameManager.getGameState() != GameState.RUNNING) return;
 
-    @EventHandler
-    public void onSpectatorRespawn(PlayerRespawnEvent e) {
-        Player player = e.getPlayer();
-        e.setRespawnLocation(e.getPlayer().getWorld().getSpawnLocation());
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                spectatorManager.setPlayerAsSpectator(player);
-            }
-        }.runTaskLater(Main.getJavaPlugin(), 1);
+        spectatorManager.setPlayerAsSpectator(e.getPlayer());
     }
 
     @EventHandler
@@ -65,7 +48,7 @@ public class SpectatorListener implements Listener {
 
         e.setCancelled(true);
 
-        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.AMBIENT, 1, 0.5F);
+        Sounds.DEATH.playSoundForPlayer(player);
         CorpseManager.CorpseData corpse = corpseManager.spawnCorpse(player, player.getLocation());
 
         spectatorManager.setPlayerAsSpectator(player);
@@ -76,7 +59,7 @@ public class SpectatorListener implements Listener {
 
         if(event.getDamager() instanceof Player) {
             Player damager = (Player) event.getDamager();
-            damager.playSound(damager.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.AMBIENT, 1, 1.5F);
+            Sounds.KILL.playSoundForPlayer(player);
             scoreboardManager.increaseKillCounter(damager);
             damager.sendMessage(String.format(damager.getInventory().getItemInMainHand().getType().isAir() ? Language.KILLER_FIST.getFormattedText() : Language.KILLER_SLAIN.getFormattedText(), player.getDisplayName()));
             player.sendMessage(String.format(Language.VICTIM_SLAIN.getFormattedText(), damager.getDisplayName()));
@@ -87,7 +70,7 @@ public class SpectatorListener implements Listener {
             Arrow arrow = (Arrow) event.getDamager();
             if(!(arrow.getShooter() instanceof Player)) return;
             Player damager = (Player) arrow.getShooter();
-            damager.playSound(damager.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.AMBIENT, 1, 1.5F);
+            Sounds.KILL.playSoundForPlayer(player);
             scoreboardManager.increaseKillCounter(damager);
             damager.sendMessage(String.format(Language.KILLER_SHOT.getFormattedText(), player.getDisplayName()));
             player.sendMessage(String.format(Language.VICTIM_SHOT.getFormattedText(), damager.getDisplayName()));

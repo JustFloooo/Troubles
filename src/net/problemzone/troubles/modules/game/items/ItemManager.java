@@ -1,5 +1,6 @@
 package net.problemzone.troubles.modules.game.items;
 
+import net.problemzone.troubles.util.Sounds;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +16,6 @@ public class ItemManager {
             Set.of(new ItemStack(Material.BOW), new ItemStack(Material.ARROW, 16)),
             Set.of(new ItemStack(Material.WOODEN_AXE)),
             Set.of(new ItemStack(Material.STONE_AXE)),
-            Set.of(new ItemStack(Material.SHIELD)),
             Set.of(new ItemStack(Material.CROSSBOW), new ItemStack(Material.ARROW, 10))
     );
 
@@ -29,6 +29,7 @@ public class ItemManager {
 
         //Add all Items for a Random Set to Inventory
         potentialItemChoice.stream().skip((int) (Math.random() * potentialItemChoice.size())).findFirst().orElse(Set.of(new ItemStack(Material.AIR))).forEach(player.getInventory()::addItem);
+        Sounds.CHEST_ITEM.playSoundForPlayer(player);
 
         return true;
     }
@@ -37,6 +38,8 @@ public class ItemManager {
         if (player.getInventory().contains(enderItem)) return false;
 
         player.getInventory().addItem(enderItem);
+        Sounds.ENDER_CHEST_ITEM.playSoundForPlayer(player);
+
         return true;
     }
 
