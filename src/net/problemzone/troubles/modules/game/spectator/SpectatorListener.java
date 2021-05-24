@@ -6,6 +6,7 @@ import net.problemzone.troubles.modules.game.corpses.CorpseManager;
 import net.problemzone.troubles.modules.game.scoreboard.ScoreboardManager;
 import net.problemzone.troubles.util.Language;
 import net.problemzone.troubles.util.Sounds;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,8 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
+
+import java.util.Objects;
 
 public class SpectatorListener implements Listener {
 
@@ -35,6 +38,7 @@ public class SpectatorListener implements Listener {
     public void onSpectatorJoin(PlayerJoinEvent e) {
         if (gameManager.getGameState() != GameState.WARM_UP && gameManager.getGameState() != GameState.RUNNING) return;
 
+        e.getPlayer().teleport(Objects.requireNonNull(Bukkit.getWorld("Skeld")).getSpawnLocation());
         spectatorManager.setPlayerAsSpectator(e.getPlayer());
     }
 
@@ -59,7 +63,7 @@ public class SpectatorListener implements Listener {
 
         if(event.getDamager() instanceof Player) {
             Player damager = (Player) event.getDamager();
-            Sounds.KILL.playSoundForPlayer(player);
+            Sounds.KILL.playSoundForPlayer(damager);
             scoreboardManager.increaseKillCounter(damager);
             damager.sendMessage(String.format(damager.getInventory().getItemInMainHand().getType().isAir() ? Language.KILLER_FIST.getFormattedText() : Language.KILLER_SLAIN.getFormattedText(), player.getDisplayName()));
             player.sendMessage(String.format(Language.VICTIM_SLAIN.getFormattedText(), damager.getDisplayName()));
@@ -70,7 +74,7 @@ public class SpectatorListener implements Listener {
             Arrow arrow = (Arrow) event.getDamager();
             if(!(arrow.getShooter() instanceof Player)) return;
             Player damager = (Player) arrow.getShooter();
-            Sounds.KILL.playSoundForPlayer(player);
+            Sounds.KILL.playSoundForPlayer(damager);
             scoreboardManager.increaseKillCounter(damager);
             damager.sendMessage(String.format(Language.KILLER_SHOT.getFormattedText(), player.getDisplayName()));
             player.sendMessage(String.format(Language.VICTIM_SHOT.getFormattedText(), damager.getDisplayName()));

@@ -163,11 +163,21 @@ public class GameManager {
 
     private void checkForWin() {
         if (!playerRoleMap.containsValue(Role.TRAITOR)) {
-            finishGame(Role.INNOCENT);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    finishGame(Role.INNOCENT);
+                }
+            }.runTaskLater(Main.getJavaPlugin(), 3 * 20L);
             return;
         }
         if (!playerRoleMap.containsValue(Role.INNOCENT) && !playerRoleMap.containsValue(Role.DETECTIVE)) {
-            finishGame(Role.TRAITOR);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    finishGame(Role.TRAITOR);
+                }
+            }.runTaskLater(Main.getJavaPlugin(), 3 * 20L);
         }
     }
 
