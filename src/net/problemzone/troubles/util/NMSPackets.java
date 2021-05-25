@@ -40,7 +40,7 @@ public class NMSPackets {
         return packet;
     }
 
-    public static PacketContainer createScoreboardTeamPacket(String uuid){
+    public static PacketContainer createScoreboardTeamPacket(String uuid) {
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
 
         //Team Name
@@ -84,6 +84,19 @@ public class NMSPackets {
         return packets;
     }
 
+    public static PacketContainer createPlayerInfoPacket(EnumWrappers.PlayerInfoAction action, WrappedGameProfile profile) {
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
+
+        //Player Info Action
+        packet.getPlayerInfoAction().write(0, action);
+
+        //Player Info Data
+        PlayerInfoData playerInfoData = new PlayerInfoData(profile, 20, EnumWrappers.NativeGameMode.NOT_SET, WrappedChatComponent.fromText(""));
+        packet.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+
+        return packet;
+    }
+
     public static PacketContainer createHumanSpawnPacket(int id, UUID uuid, Location loc) {
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
 
@@ -99,21 +112,8 @@ public class NMSPackets {
         packet.getDoubles().write(2, loc.getZ());
 
         //Angles
-        packet.getBytes().write(0, (byte) loc.getYaw());
-        packet.getBytes().write(1, (byte) loc.getPitch());
-
-        return packet;
-    }
-
-    public static PacketContainer createPlayerInfoPacket(EnumWrappers.PlayerInfoAction action, WrappedGameProfile profile) {
-        PacketContainer packet = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
-
-        //Player Info Action
-        packet.getPlayerInfoAction().write(0, action);
-
-        //Player Info Data
-        List<PlayerInfoData> playerInfoData = Collections.singletonList(new PlayerInfoData(profile, -1, EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText("[CR]")));
-        packet.getPlayerInfoDataLists().write(0, playerInfoData);
+        packet.getBytes().write(0, (byte) (loc.getYaw() * 256F / 360F));
+        packet.getBytes().write(1, (byte) (loc.getPitch() * 256F / 360F));
 
         return packet;
     }

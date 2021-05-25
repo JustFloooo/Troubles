@@ -5,15 +5,13 @@ import com.comphenix.protocol.reflect.accessors.Accessors;
 import com.comphenix.protocol.reflect.accessors.FieldAccessor;
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
-import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_16_R3.*;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import net.problemzone.troubles.Main;
 import net.problemzone.troubles.util.NMSPackets;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -31,26 +29,6 @@ public class CorpseManager {
     private static final FieldAccessor ENTITY_ID_ACCESSOR = Accessors.getFieldAccessor(MinecraftReflection.getEntityClass(), "entityCount", true);
 
     private final List<CorpseData> corpses = new ArrayList<>();
-
-    public static DataWatcher clonePlayerDatawatcher(Player player, int currentEntId) {
-
-        Location loc = player.getLocation();
-        EntityHuman h = new EntityHuman(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(loc.getX(), loc.getY(), loc.getZ()), loc.getYaw(), ((CraftPlayer) player).getProfile()) {
-            public BlockPosition getChunkCoordinates() {
-                return null;
-            }
-
-            public boolean isSpectator() {
-                return false;
-            }
-
-            public boolean isCreative() {
-                return false;
-            }
-        };
-        h.e(currentEntId);
-        return h.getDataWatcher();
-    }
 
     public WrappedGameProfile cloneProfileWithRandomUUID(WrappedGameProfile oldProf, String name) {
         WrappedGameProfile newProf = new WrappedGameProfile(UUID.randomUUID(), name);
@@ -74,12 +52,9 @@ public class CorpseManager {
 
     public CorpseData spawnCorpse(Player p, Location loc) {
         int entityId = getNextEntityIdAtomic();
-
         WrappedGameProfile prof = cloneProfileWithRandomUUID(WrappedGameProfile.fromPlayer(p), "");
 
-        DataWatcher dw = clonePlayerDatawatcher(p, entityId);
-
-        CorpseData data = getNMSCorpseData(loc, entityId, prof, dw);
+        CorpseData data = getNMSCorpseData(loc, entityId, prof);
 
         data.corpseName = p.getName();
         corpses.add(data);
@@ -88,9 +63,7 @@ public class CorpseManager {
         return data;
     }
 
-    private CorpseData getNMSCorpseData(Location loc, int entityId, WrappedGameProfile prof, DataWatcher dw) {
-        DataWatcherObject<Byte> skinFlags = new DataWatcherObject<>(16, DataWatcherRegistry.a);
-        dw.set(skinFlags, (byte) 0x7F);
+    private CorpseData getNMSCorpseData(Location loc, int entityId, WrappedGameProfile prof) {
 
         Location locUnder = getNonClippableBlockUnderPlayer(loc, 1);
         Location used = locUnder != null ? locUnder : loc;
@@ -124,14 +97,6 @@ public class CorpseManager {
         return corpses;
     }
 
-    static class CustomEntityPlayer extends EntityPlayer {
-
-        public CustomEntityPlayer(Player p, WrappedGameProfile prof) {
-            super(((CraftWorld) p.getWorld()).getHandle().getMinecraftServer(), ((CraftWorld) p.getWorld()).getHandle(), new GameProfile(prof.getUUID(), prof.getName()), new PlayerInteractManager(((CraftWorld) p.getWorld()).getHandle()));
-        }
-
-    }
-
     public static class CorpseData {
 
         private final WrappedGameProfile prof;
@@ -158,12 +123,11 @@ public class CorpseManager {
             NMSPackets.sendPacket(p, movePacket);
             NMSPackets.sendPacket(p, nameTagPacket);
 
-            //List<WrappedWatchableObject> wrappedWatchableObjectList = Collections.singletonList(new WrappedWatchableObject(0, (byte) 0x01));
-            //Bukkit.broadcastMessage("CHECK");
-            //PacketContainer metadataPacket = NMSPackets.createPlayerMetadataPacket(entityId, wrappedWatchableObjectList);
-            //NMSPackets.sendPacket(p, metadataPacket);
-
-            makePlayerSleep(p);
+            WrappedWatchableObject skin = new WrappedWatchableObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Byte.class)), (byte) 0xff);
+            WrappedWatchableObject pose = new WrappedWatchableObject(new WrappedDataWatcher.WrappedDataWatcherObject(6, WrappedDataWatcher.Registry.get(EnumWrappers.getEntityPoseClass())), EnumWrappers.EntityPose.SLEEPING.toNms());
+            List<WrappedWatchableObject> wrappedWatchableObjectList = List.of(skin, pose);
+            PacketContainer metadataPacket = NMSPackets.createPlayerMetadataPacket(entityId, wrappedWatchableObjectList);
+            NMSPackets.sendPacket(p, metadataPacket);
 
             new BukkitRunnable() {
                 @Override
@@ -172,25 +136,6 @@ public class CorpseManager {
                 }
             }.runTaskLater(Main.getJavaPlugin(), REMOVE_TIMER * 20L);
 
-        }
-
-        private void makePlayerSleep(Player p) {
-            PlayerConnection conn = ((CraftPlayer) p).getHandle().playerConnection;
-
-            EntityPlayer entityPlayer = new CustomEntityPlayer(p, prof);
-            entityPlayer.e(entityId); //sets the entity id
-
-            try {
-                //These lines force an entity player into the sleeping position
-                Field poseF = Entity.class.getDeclaredField("POSE");
-                poseF.setAccessible(true);
-                DataWatcherObject<EntityPose> POSE = (DataWatcherObject<EntityPose>) poseF.get(null);
-                entityPlayer.getDataWatcher().set(POSE, EntityPose.SLEEPING);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            conn.sendPacket(new PacketPlayOutEntityMetadata(entityPlayer.getId(), entityPlayer.getDataWatcher(), false));
         }
 
         public Location getOrigLocation() {
