@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +23,7 @@ public class Countdown {
     private static BukkitTask chatCountdown;
 
 
-    public static void createLevelCountdown(int seconds, Language title){
+    public static void createLevelCountdown(int seconds, @Nullable Language title) {
 
         cancelLevelCountdown();
 
@@ -32,15 +33,15 @@ public class Countdown {
             @Override
             public void run() {
                 Bukkit.getOnlinePlayers().forEach(player -> {
+                    player.setLevel(level.get());
+
                     if (level.get() <= 0) {
                         if (!this.isCancelled()) this.cancel();
                         return;
                     }
 
-                    player.setLevel(level.get());
-
                     if (level.get() <= 3) {
-                        player.sendTitle(title.getText(), ChatColor.GREEN + "" + player.getLevel(), 0, 20, 0);
+                        if(title != null) player.sendTitle(title.getText(), ChatColor.GREEN + "" + player.getLevel(), 0, 20, 0);
                     }
                 });
                 level.getAndDecrement();
@@ -52,7 +53,7 @@ public class Countdown {
 
         cancelXpBarCountdown();
 
-        final float division = XP_BAR_TICK_SPEED / (seconds*20F);
+        final float division = XP_BAR_TICK_SPEED / (seconds * 20F);
         AtomicReference<Float> value = new AtomicReference<>((float) 1);
 
         xpBarCountdown = new BukkitRunnable() {
@@ -79,7 +80,7 @@ public class Countdown {
         chatCountdown = new BukkitRunnable() {
             @Override
             public void run() {
-                if (remaining.get() <= 0){
+                if (remaining.get() <= 0) {
                     Bukkit.getOnlinePlayers().forEach(Sounds.CLICK_TIMER_END::playSoundForPlayer);
                     if (!this.isCancelled()) this.cancel();
                     return;
@@ -93,21 +94,21 @@ public class Countdown {
         }.runTaskTimer(Main.getJavaPlugin(), 0, 20);
     }
 
-    public static void cancelLevelCountdown(){
-        if(levelCountdown==null)return;
-        if(!levelCountdown.isCancelled()) levelCountdown.cancel();
+    public static void cancelLevelCountdown() {
+        if (levelCountdown == null) return;
+        if (!levelCountdown.isCancelled()) levelCountdown.cancel();
         Bukkit.getOnlinePlayers().forEach(player -> player.setLevel(0));
     }
 
-    public static void cancelXpBarCountdown(){
-        if(xpBarCountdown==null)return;
-        if(!xpBarCountdown.isCancelled()) xpBarCountdown.cancel();
+    public static void cancelXpBarCountdown() {
+        if (xpBarCountdown == null) return;
+        if (!xpBarCountdown.isCancelled()) xpBarCountdown.cancel();
         Bukkit.getOnlinePlayers().forEach(player -> player.setExp(0));
     }
 
-    public static void cancelChatCountdown(){
-        if(chatCountdown==null)return;
-        if(!chatCountdown.isCancelled()) chatCountdown.cancel();
+    public static void cancelChatCountdown() {
+        if (chatCountdown == null) return;
+        if (!chatCountdown.isCancelled()) chatCountdown.cancel();
     }
 
 }

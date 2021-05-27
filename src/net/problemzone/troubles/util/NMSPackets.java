@@ -128,7 +128,6 @@ public class NMSPackets {
         packet.getShorts().write(1, (short) (-61.8));
 
         return packet;
-
     }
 
     public static PacketContainer createPlayerMetadataPacket(int id, List<WrappedWatchableObject> metadata) {

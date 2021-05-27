@@ -30,6 +30,24 @@ public class CorpseManager {
 
     private final List<CorpseData> corpses = new ArrayList<>();
 
+    public CorpseData spawnCorpse(Player p, Location loc) {
+        int entityId = getNextEntityIdAtomic();
+        WrappedGameProfile prof = cloneProfileWithRandomUUID(WrappedGameProfile.fromPlayer(p), "");
+
+        Location locUnder = getNonClippableBlockUnderPlayer(loc, 1);
+        Location used = locUnder != null ? locUnder : loc;
+        used.setYaw(loc.getYaw());
+        used.setPitch(loc.getPitch());
+
+        CorpseData data = new CorpseData(prof, used, entityId);
+
+        data.corpseName = p.getName();
+        corpses.add(data);
+        Objects.requireNonNull(data.getOrigLocation().getWorld()).getPlayers().forEach(data::sendCorpseToPlayer);
+
+        return data;
+    }
+
     public WrappedGameProfile cloneProfileWithRandomUUID(WrappedGameProfile oldProf, String name) {
         WrappedGameProfile newProf = new WrappedGameProfile(UUID.randomUUID(), name);
         newProf.getProperties().putAll(oldProf.getProperties());
@@ -50,33 +68,6 @@ public class CorpseManager {
         return null;
     }
 
-    public CorpseData spawnCorpse(Player p, Location loc) {
-        int entityId = getNextEntityIdAtomic();
-        WrappedGameProfile prof = cloneProfileWithRandomUUID(WrappedGameProfile.fromPlayer(p), "");
-
-        CorpseData data = getNMSCorpseData(loc, entityId, prof);
-
-        data.corpseName = p.getName();
-        corpses.add(data);
-        Objects.requireNonNull(data.getOrigLocation().getWorld()).getPlayers().forEach(data::sendCorpseToPlayer);
-
-        return data;
-    }
-
-    private CorpseData getNMSCorpseData(Location loc, int entityId, WrappedGameProfile prof) {
-
-        Location locUnder = getNonClippableBlockUnderPlayer(loc, 1);
-        Location used = locUnder != null ? locUnder : loc;
-        used.setYaw(loc.getYaw());
-        used.setPitch(loc.getPitch());
-
-        return new CorpseData(prof, used, entityId);
-    }
-
-    public void cowHit(Player player, CorpseData data) {
-        player.sendMessage(data.getCorpseName());
-    }
-
     public int getNextEntityIdAtomic() {
 
         try{
@@ -95,6 +86,10 @@ public class CorpseManager {
 
     public List<CorpseData> getAllCorpses() {
         return corpses;
+    }
+
+    public void cowHit(Player player, CorpseData data) {
+        player.sendMessage(data.getCorpseName());
     }
 
     public static class CorpseData {

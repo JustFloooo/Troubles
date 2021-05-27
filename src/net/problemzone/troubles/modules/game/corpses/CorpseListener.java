@@ -7,6 +7,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import javax.annotation.Nullable;
+
 public class CorpseListener implements Listener {
 
     private final CorpseManager corpseManager;
@@ -17,7 +19,7 @@ public class CorpseListener implements Listener {
 
     @EventHandler
     public void showCorpseOnJoin(PlayerJoinEvent e) {
-        //TODO: Show..
+        corpseManager.getAllCorpses().forEach(corpseData -> corpseData.sendCorpseToPlayer(e.getPlayer()));
     }
 
     @EventHandler
@@ -32,6 +34,7 @@ public class CorpseListener implements Listener {
         corpseManager.cowHit(e.getPlayer(), cd);
     }
 
+    @Nullable
     public CorpseManager.CorpseData getCorpseInRadius(Location locClick, double radius) {
         for (CorpseManager.CorpseData cd : corpseManager.getAllCorpses()) {
             Location locCorpse = cd.getOrigLocation();

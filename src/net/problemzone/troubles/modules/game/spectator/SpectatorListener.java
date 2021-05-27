@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -34,7 +35,7 @@ public class SpectatorListener implements Listener {
         this.corpseManager = corpseManager;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpectatorJoin(PlayerJoinEvent e) {
         if (gameManager.getGameState() != GameState.WARM_UP && gameManager.getGameState() != GameState.RUNNING) return;
 

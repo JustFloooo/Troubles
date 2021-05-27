@@ -1,13 +1,12 @@
 package net.problemzone.troubles.modules;
 
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -48,9 +47,7 @@ public class WorldProtectionListener implements Listener {
 
     @EventHandler
     //Cancel Entity Spawns
-    public void onEntitySpawn(EntitySpawnEvent e) {
-        if (e.getEntityType() == EntityType.ARROW) return;
-        if (e.getEntityType() == EntityType.DROPPED_ITEM) return;
+    public void onEntitySpawn(CreatureSpawnEvent e) {
         e.setCancelled(true);
     }
 

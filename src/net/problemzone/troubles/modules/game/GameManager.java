@@ -192,15 +192,26 @@ public class GameManager {
         Bukkit.getOnlinePlayers().forEach(player -> playerManager.announceWin(player, role));
 
         Countdown.createChatCountdown(FINAL_LOBBY_TIME, Language.SERVER_CLOSE);
+        Countdown.createXpBarCountdown(FINAL_LOBBY_TIME);
+        Countdown.createLevelCountdown(FINAL_LOBBY_TIME, null);
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 Bukkit.getOnlinePlayers().forEach(playerManager::sendPlayerToHub);
+                shutdownServer();
+            }
+        }.runTaskLater(Main.getJavaPlugin(), FINAL_LOBBY_TIME * 20L);
+
+    }
+
+    private void shutdownServer() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
                 Bukkit.getServer().shutdown();
             }
-        }.runTaskLater(Main.getJavaPlugin(), FINAL_LOBBY_TIME * 20L + 1);
-
+        }.runTaskLater(Main.getJavaPlugin(), 20);
     }
 
     public Role getPlayerRole(Player player) {

@@ -30,7 +30,7 @@ public class Main extends JavaPlugin {
     private final CorpseManager corpseManager = new CorpseManager();
     private final ItemManager itemManager = new ItemManager();
     private final SpectatorManager spectatorManager = new SpectatorManager(scoreboardManager);
-    private final PlayerManager playerManager = new PlayerManager(scoreboardManager, spectatorManager);
+    private final PlayerManager playerManager = new PlayerManager(scoreboardManager, spectatorManager, itemManager);
     private final TesterManager testerManager = new TesterManager();
 
     private final GameManager gameManager = new GameManager(scoreboardManager, playerManager);
@@ -56,7 +56,7 @@ public class Main extends JavaPlugin {
         getLogger().info("Troubles primed and ready.");
     }
 
-    private void initiatePlugin(){
+    private void initiatePlugin() {
         javaPlugin = this;
     }
 
