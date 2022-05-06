@@ -28,6 +28,8 @@ public enum Language {
     KILLER_FIST("Du hast " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " rektal bis zum Tode gefistet"),
     VICTIM_SLAIN("Du wurdest von " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " umgebracht"),
     VICTIM_SHOT("Du wurdest von " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " erschossen"),
+    IDENTIFY_CORPSE("Du hast die Leiche von " + ChatColor.WHITE + "%s" + ChatColor.GRAY + " identifiziert."),
+    IDENTIFY_ROLE(ChatColor.WHITE + "%s" + ChatColor.GRAY + " war ein " + ChatColor.YELLOW + "%s"),
     SPECTATOR_MESSAGE("%s : %s");
 
     private static final String SYSTEM_PREFIX = ChatColor.RED + "Troubles " + ChatColor.DARK_GRAY + "» ";

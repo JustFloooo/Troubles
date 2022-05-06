@@ -1,5 +1,6 @@
 package net.problemzone.troubles.modules.game.spectator;
 
+import net.problemzone.troubles.Main;
 import net.problemzone.troubles.modules.game.GameManager;
 import net.problemzone.troubles.modules.game.GameState;
 import net.problemzone.troubles.modules.game.corpses.CorpseManager;
@@ -41,6 +42,7 @@ public class SpectatorListener implements Listener {
 
         e.getPlayer().teleport(Objects.requireNonNull(Bukkit.getWorld("Skeld")).getSpawnLocation());
         spectatorManager.setPlayerAsSpectator(e.getPlayer());
+        spectatorManager.getSpectators().forEach(player -> e.getPlayer().hidePlayer(Main.getJavaPlugin(), player));
     }
 
     @EventHandler

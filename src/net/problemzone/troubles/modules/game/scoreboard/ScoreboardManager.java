@@ -52,12 +52,4 @@ public class ScoreboardManager {
         player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
     }
 
-    public void setSpectatorTeam(String entry){
-        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
-
-        Team team = scoreboard.registerNewTeam("spectator");
-        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-        team.addEntry(entry);
-    }
-
 }
